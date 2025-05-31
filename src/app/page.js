@@ -156,6 +156,10 @@ export default function ChatInterface() {
     setFolders((prev) => prev.map((folder) => (folder.id === folderId ? { ...folder, name: newName } : folder)))
   }
 
+  const handleMoveChat = (chatId, targetFolderId) => {
+    setChats((prev) => prev.map((chat) => (chat.id === chatId ? { ...chat, folderId: targetFolderId } : chat)))
+  }
+
   const hasStartedChat = messages.length > 0
 
   return (
@@ -172,6 +176,7 @@ export default function ChatInterface() {
         onDeleteFolder={handleDeleteFolder}
         onRenameChat={handleRenameChat}
         onRenameFolder={handleRenameFolder}
+        onMoveChat={handleMoveChat}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
       />

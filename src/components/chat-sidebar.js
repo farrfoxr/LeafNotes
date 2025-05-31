@@ -30,6 +30,7 @@ export function ChatSidebar({
   onDeleteFolder,
   onRenameChat,
   onRenameFolder,
+  onMoveChat,
   isOpen,
   onToggle,
 }) {
@@ -37,6 +38,8 @@ export function ChatSidebar({
   const [editingItem, setEditingItem] = useState(null)
   const [editingValue, setEditingValue] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
+  const [draggedItem, setDraggedItem] = useState(null)
+  const [dragOverTarget, setDragOverTarget] = useState(null)
 
   const toggleFolder = (folderId) => {
     const newExpanded = new Set(expandedFolders)
@@ -74,18 +77,66 @@ export function ChatSidebar({
     }
   }
 
+  // Drag and Drop handlers
+  const handleDragStart = (e, item, type) => {
+    setDraggedItem({ ...item, type })
+    e.dataTransfer.effectAllowed = "move"
+    e.dataTransfer.setData("text/plain", "")
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+  }
+
+  const handleDragEnter = (e, target) => {
+    e.preventDefault()
+    setDragOverTarget(target)
+  }
+
+  const handleDragLeave = (e) => {
+    // Only clear if we're leaving the entire drop zone
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setDragOverTarget(null)
+    }
+  }
+
+  const handleDrop = (e, targetFolderId = null) => {
+    e.preventDefault()
+    setDragOverTarget(null)
+
+    if (!draggedItem || draggedItem.type !== "chat") return
+
+    // Move chat to target folder (or unsorted if targetFolderId is null)
+    if (onMoveChat) {
+      onMoveChat(draggedItem.id, targetFolderId)
+    }
+
+    setDraggedItem(null)
+  }
+
+  const handleDragEnd = () => {
+    setDraggedItem(null)
+    setDragOverTarget(null)
+  }
+
   const renderChat = (chat, isInFolder = false) => {
     const isEditing = editingItem?.id === chat.id && editingItem?.type === "chat"
     const isActive = currentChatId === chat.id
+    const isDragging = draggedItem?.id === chat.id
 
     return (
       <div
         key={chat.id}
+        draggable={!isEditing}
+        onDragStart={(e) => handleDragStart(e, chat, "chat")}
+        onDragEnd={handleDragEnd}
         className={cn(
           "group flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200",
           isActive ? "bg-[#6b886b] text-white shadow-sm" : "hover:bg-[#cbd0bf]/50 text-[#8a9b69]",
           isInFolder && "ml-6",
           !isOpen && "justify-center px-2",
+          isDragging && "opacity-50",
         )}
         onClick={() => !isEditing && onChatSelect(chat.id)}
       >
@@ -138,12 +189,22 @@ export function ChatSidebar({
     const isExpanded = expandedFolders.has(folder.id)
     const isEditing = editingItem?.id === folder.id && editingItem?.type === "folder"
     const folderChats = chats.filter((chat) => chat.folderId === folder.id)
+    const isDropTarget = dragOverTarget === folder.id
+    const canDrop = draggedItem?.type === "chat"
 
     return (
       <div key={folder.id} className="mb-1">
         <div
-          className="group flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-[#cbd0bf]/50 text-[#8a9b69] transition-all duration-200 min-h-[36px]"
+          className={cn(
+            "group flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 min-h-[36px]",
+            "hover:bg-[#cbd0bf]/50 text-[#8a9b69]",
+            isDropTarget && canDrop && "bg-[#6b886b]/20 border-2 border-dashed border-[#6b886b]",
+          )}
           onClick={() => !isEditing && toggleFolder(folder.id)}
+          onDragOver={handleDragOver}
+          onDragEnter={(e) => handleDragEnter(e, folder.id)}
+          onDragLeave={handleDragLeave}
+          onDrop={(e) => handleDrop(e, folder.id)}
         >
           <div className="flex items-center gap-2 flex-1 min-w-0">
             {isExpanded ? (
@@ -208,10 +269,20 @@ export function ChatSidebar({
     )
   }
 
-  const unorganizedChats = chats.filter((chat) => !chat.folderId)
+  // Sort folders alphabetically
+  const sortedFolders = [...folders].sort((a, b) => a.name.localeCompare(b.name))
+
+  // Sort unsorted chats by creation time (newest first)
+  const unorganizedChats = chats
+    .filter((chat) => !chat.folderId)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
   const filteredChats = searchQuery
     ? unorganizedChats.filter((chat) => chat.title.toLowerCase().includes(searchQuery.toLowerCase()))
     : unorganizedChats
+
+  const isUnsortedDropTarget = dragOverTarget === "unsorted"
+  const canDropInUnsorted = draggedItem?.type === "chat"
 
   return (
     <div
@@ -271,20 +342,51 @@ export function ChatSidebar({
         <div className={cn("space-y-1", isOpen ? "px-3" : "px-2")}>
           {isOpen ? (
             <>
-              {/* New Folder Button */}
-              <button
-                onClick={onNewFolder}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69]/70 transition-all duration-200 text-sm font-medium mb-2"
-              >
-                <Folder className="w-4 h-4" />
-                <span>New Folder</span>
-              </button>
+              {/* Folders Section */}
+              <div className="space-y-1">
+                {/* New Folder Button */}
+                <button
+                  onClick={onNewFolder}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69]/70 transition-all duration-200 text-sm font-medium mb-2"
+                >
+                  <Folder className="w-4 h-4" />
+                  <span>Create Folder</span>
+                </button>
 
-              {/* Folders */}
-              {folders.map(renderFolder)}
+                {/* Folders */}
+                {sortedFolders.map(renderFolder)}
+              </div>
 
-              {/* Chats */}
-              {filteredChats.map((chat) => renderChat(chat))}
+              {/* Section Divider */}
+              {(sortedFolders.length > 0 || filteredChats.length > 0) && (
+                <div className="my-4">
+                  <div className="h-px bg-[#cbd0bf]/40 mx-2"></div>
+                </div>
+              )}
+
+              {/* Unsorted Chats Section */}
+              {filteredChats.length > 0 && (
+                <div
+                  className={cn(
+                    "space-y-1 min-h-[40px] rounded-lg transition-all duration-200",
+                    isUnsortedDropTarget &&
+                      canDropInUnsorted &&
+                      "bg-[#6b886b]/10 border-2 border-dashed border-[#6b886b]",
+                  )}
+                  onDragOver={handleDragOver}
+                  onDragEnter={(e) => handleDragEnter(e, "unsorted")}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, null)}
+                >
+                  {/* Section Label */}
+                  <div className="px-3 py-1">
+                    <span className="text-xs font-medium text-[#8a9b69]/60 uppercase tracking-wide">Recent Chats</span>
+                  </div>
+
+                  {/* Unsorted Chats */}
+                  {filteredChats.map((chat) => renderChat(chat))}
+                </div>
+              )}
             </>
           ) : (
             <>
