@@ -159,12 +159,7 @@ export function ChatSidebar({
                 onChange={(e) => setEditingValue(e.target.value)}
                 onBlur={finishEditing}
                 onKeyDown={handleKeyDown}
-                className="flex-1 bg-transparent border-none outline-none text-sm min-w-0 text-right"
-                style={{
-                  direction: "rtl",
-                  textAlign: "right",
-                  unicodeBidi: "plaintext",
-                }}
+                className="flex-1 bg-transparent border-none outline-none text-sm min-w-0"
                 autoFocus
               />
             ) : (
@@ -240,12 +235,7 @@ export function ChatSidebar({
                 onChange={(e) => setEditingValue(e.target.value)}
                 onBlur={finishEditing}
                 onKeyDown={handleKeyDown}
-                className="flex-1 bg-transparent border-none outline-none text-sm font-medium min-w-0 text-right"
-                style={{
-                  direction: "rtl",
-                  textAlign: "right",
-                  unicodeBidi: "plaintext",
-                }}
+                className="flex-1 bg-transparent border-none outline-none text-sm font-medium min-w-0"
                 autoFocus
                 onClick={(e) => e.stopPropagation()}
               />
@@ -354,25 +344,25 @@ export function ChatSidebar({
         )}
       >
         {/* Header */}
-        <div className="flex-shrink-0 border-b border-[#cbd0bf]/40 p-4"> {/* Increased padding */}
-          <div className="flex flex-col gap-3">
-            {/* Toggle Button - Centered in collapsed mode */}
+        <div className="flex-shrink-0 border-b border-[#cbd0bf]/40 p-4">
+          <div className={cn("flex flex-col gap-3", !isOpen && "items-center")}>
+            {/* Toggle Button - Properly centered in collapsed mode */}
             <button
               onClick={onToggle}
               className={cn(
                 "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69] h-10",
-                isOpen ? "px-3 w-full" : "w-10 justify-center mx-auto"
+                isOpen ? "px-3 w-full" : "w-10 justify-center"
               )}
             >
               <PanelLeft className={cn("transition-transform duration-300 w-5 h-5", !isOpen && "rotate-180")} />
             </button>
 
-            {/* New Chat Button - Centered in collapsed mode */}
+            {/* New Chat Button - Properly centered in collapsed mode */}
             <button
               onClick={() => handleNewChatInFolder()}
               className={cn(
                 "flex items-center bg-[#6b886b] hover:bg-[#6b886b]/90 text-white rounded-lg transition-all duration-300 font-medium shadow-sm h-10",
-                isOpen ? "w-full px-3 gap-3" : "w-10 justify-center mx-auto"
+                isOpen ? "w-full px-3 gap-3" : "w-10 justify-center"
               )}
             >
               <Plus className="w-5 h-5 flex-shrink-0" />
@@ -384,7 +374,7 @@ export function ChatSidebar({
               </span>
             </button>
 
-            {/* Search - Centered in collapsed mode */}
+            {/* Search - Properly centered in collapsed mode */}
             {isOpen ? (
               <div className="relative w-full h-10">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8a9b69]/60" />
@@ -397,7 +387,7 @@ export function ChatSidebar({
                 />
               </div>
             ) : (
-              <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69] mx-auto">
+              <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69]">
                 <Search className="w-5 h-5" />
               </button>
             )}
@@ -406,7 +396,7 @@ export function ChatSidebar({
 
         {/* Navigation Items - Scrollable with Custom Scrollbar */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4 min-h-0 custom-scrollbar">
-          <div className={cn("space-y-1", isOpen ? "px-4" : "px-2")}> {/* Increased padding */}
+          <div className={cn("space-y-1", isOpen ? "px-4" : "px-2")}>
             {isOpen ? (
               <>
                 {/* Folders Section */}
@@ -457,14 +447,14 @@ export function ChatSidebar({
               </>
             ) : (
               <>
-                {/* Show only active chat indicator in collapsed mode - centered buttons */}
-                <div className="flex flex-col space-y-2 items-center">
+                {/* Show only active chat indicator in collapsed mode - perfectly centered buttons */}
+                <div className="flex flex-col space-y-2 items-center w-full">
                   {unorganizedChats.slice(0, 3).map((chat) => (
                     <button
                       key={chat.id}
                       onClick={() => onChatSelect(chat.id)}
                       className={cn(
-                        "w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-300",
+                        "w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-300 flex-shrink-0",
                         currentChatId === chat.id 
                           ? "bg-[#6b886b] text-white shadow-sm" 
                           : "hover:bg-[#cbd0bf]/50 text-[#8a9b69]"
@@ -479,22 +469,24 @@ export function ChatSidebar({
           </div>
         </div>
 
-        {/* Settings at Bottom - Centered in collapsed mode */}
-        <div className="flex-shrink-0 border-t border-[#cbd0bf]/40 p-4"> {/* Increased padding */}
-          <button 
-            className={cn(
-              "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69] h-10",
-              isOpen ? "w-full px-3 gap-3" : "w-10 justify-center mx-auto"
-            )}
-          >
-            <Settings className="w-5 h-5 flex-shrink-0" />
-            <span className={cn(
-              "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-              isOpen ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
-            )}>
-              Settings
-            </span>
-          </button>
+        {/* Settings at Bottom - Properly centered in collapsed mode */}
+        <div className="flex-shrink-0 border-t border-[#cbd0bf]/40 p-4">
+          <div className={cn(!isOpen && "flex justify-center")}>
+            <button 
+              className={cn(
+                "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69] h-10",
+                isOpen ? "w-full px-3 gap-3" : "w-10 justify-center"
+              )}
+            >
+              <Settings className="w-5 h-5 flex-shrink-0" />
+              <span className={cn(
+                "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
+                isOpen ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
+              )}>
+                Settings
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </>
