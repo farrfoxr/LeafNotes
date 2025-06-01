@@ -175,7 +175,7 @@ export default function ChatInterface() {
 
   // Get current chat title
   const currentChat = chats.find((chat) => chat.id === currentChatId)
-  const currentChatTitle = currentChat?.title || ""
+  const currentChatTitle = currentChat?.title || "New Chat"
 
   return (
     <div className="h-screen bg-[#e4e4d4] font-monkeytype flex overflow-hidden">
@@ -197,76 +197,122 @@ export default function ChatInterface() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Chat Messages */}
-        {hasStartedChat && (
-          <div className="flex-1 overflow-hidden">
-            <div className="max-w-4xl mx-auto px-6 py-6 h-full overflow-hidden">
-              {/* Chat Title - No border, normal font weight */}
-              {currentChatTitle && (
-                <div className="mb-4 text-center">
-                  <h2 className="text-base font-normal text-[#8a9b69]">{currentChatTitle}</h2>
-                </div>
-              )}
+      <div className="flex-1 flex flex-col min-w-0">
+        {hasStartedChat ? (
+          <>
+            {/* Chat Title Header - Fixed position */}
+            <div className="flex-shrink-0 py-4 px-6 bg-[#e4e4d4] border-b border-[#cbd0bf]/30">
+              <h2 className="text-center text-[#8a9b69] text-lg font-normal tracking-wide">{currentChatTitle}</h2>
+            </div>
 
-              <div className="space-y-6 h-full overflow-y-auto overflow-x-hidden scrollbar-hide">
-                {messages.map((message) => (
-                  <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-3 break-words ${
-                        message.role === "user" ? "bg-[#6b886b] text-white user-message" : "bg-[#cbd0bf] text-[#8a9b69]"
-                      }`}
-                    >
-                      <p className="text-sm leading-relaxed break-words">{message.content}</p>
-                      <p className="text-xs opacity-70 mt-2">
-                        {message.timestamp.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
+            {/* Messages Container - Flexible height */}
+            <div className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 overflow-y-auto">
+                <div className="max-w-4xl mx-auto px-6 py-6">
+                  <div className="space-y-6">
+                    {messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                      >
+                        <div
+                          className={`max-w-[80%] rounded-2xl px-4 py-3 break-words ${
+                            message.role === "user" ? "bg-[#6b886b] text-white" : "bg-[#cbd0bf] text-[#8a9b69]"
+                          }`}
+                        >
+                          <p className="text-sm leading-relaxed break-words">{message.content}</p>
+                          <p className="text-xs opacity-70 mt-2">
+                            {message.timestamp.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-[#cbd0bf] text-[#8a9b69] rounded-2xl px-4 py-3">
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-[#8a9b69] rounded-full animate-bounce"></div>
+                            <div
+                              className="w-2 h-2 bg-[#8a9b69] rounded-full animate-bounce"
+                              style={{ animationDelay: "0.1s" }}
+                            ></div>
+                            <div
+                              className="w-2 h-2 bg-[#8a9b69] rounded-full animate-bounce"
+                              style={{ animationDelay: "0.2s" }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={messagesEndRef} />
                   </div>
-                ))}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-[#cbd0bf] text-[#8a9b69] rounded-2xl px-4 py-3">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-[#8a9b69] rounded-full animate-bounce"></div>
-                        <div
-                          className="w-2 h-2 bg-[#8a9b69] rounded-full animate-bounce"
-                          style={{ animationDelay: "0.1s" }}
-                        ></div>
-                        <div
-                          className="w-2 h-2 bg-[#8a9b69] rounded-full animate-bounce"
-                          style={{ animationDelay: "0.2s" }}
-                        ></div>
+                </div>
+              </div>
+
+              {/* Input Section - Fixed at bottom */}
+              <div className="flex-shrink-0 p-4 bg-[#e4e4d4]">
+                <div className="max-w-3xl mx-auto">
+                  <form onSubmit={handleSubmit} className="relative">
+                    <div className="bg-[#6b886b] rounded-2xl p-4 shadow-lg">
+                      <div className="flex items-center gap-3">
+                        {/* Attachment Button */}
+                        <button type="button" className="text-[#e4e4d4] hover:text-[#cbd0bf] transition-colors p-1">
+                          <Paperclip className="w-5 h-5" />
+                        </button>
+
+                        {/* Input Field */}
+                        <div className="flex-1 relative flex items-center">
+                          <textarea
+                            ref={textareaRef}
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Type your message..."
+                            className="w-full bg-transparent text-[#e4e4d4] placeholder-[#e4e4d4] placeholder-opacity-70 resize-none outline-none text-sm leading-relaxed min-h-[24px] max-h-[120px] flex items-center"
+                            style={{
+                              paddingTop: "0",
+                              paddingBottom: "0",
+                              lineHeight: "24px",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                            rows={1}
+                          />
+                        </div>
+
+                        {/* Send Button with Arrow Up */}
+                        <button
+                          type="submit"
+                          disabled={!input.trim() || isLoading}
+                          className="bg-[#cbd0bf] text-[#8a9b69] p-2 rounded-lg hover:bg-opacity-80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                        >
+                          <ArrowUp className="w-5 h-5" />
+                        </button>
                       </div>
                     </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Main Content - Centered when no messages */}
-        <div className={`${!hasStartedChat ? "flex-1 flex flex-col justify-center" : ""}`}>
-          <div className="max-w-4xl mx-auto px-6 w-full">
-            {/* Header - Only show when no messages */}
-            {!hasStartedChat && (
+          </>
+        ) : (
+          /* Initial State - Centered content when no messages */
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="max-w-4xl mx-auto px-6 w-full">
+              {/* Header */}
               <div className="text-center mb-16">
                 <h1 className="text-5xl md:text-6xl font-light text-[#8a9b69] tracking-wide">Leaf Notes</h1>
               </div>
-            )}
 
-            {/* Input Section */}
-            <div className={`relative max-w-3xl mx-auto ${hasStartedChat ? "p-4" : ""}`}>
-              <form onSubmit={handleSubmit} className="relative">
-                <div className="bg-[#6b886b] rounded-2xl p-4 shadow-lg">
-                  <div className="flex items-center gap-3">
-                    {/* Model Selector - Only show when no messages */}
-                    {!hasStartedChat && (
+              {/* Input Section */}
+              <div className="relative max-w-3xl mx-auto">
+                <form onSubmit={handleSubmit} className="relative">
+                  <div className="bg-[#6b886b] rounded-2xl p-4 shadow-lg">
+                    <div className="flex items-center gap-3">
+                      {/* Model Selector */}
                       <div className="relative">
                         <button
                           type="button"
@@ -305,54 +351,52 @@ export default function ChatInterface() {
                           ))}
                         </div>
                       </div>
-                    )}
 
-                    {/* Attachment Button */}
-                    <button type="button" className="text-[#e4e4d4] hover:text-[#cbd0bf] transition-colors p-1">
-                      <Paperclip className="w-5 h-5" />
-                    </button>
+                      {/* Attachment Button */}
+                      <button type="button" className="text-[#e4e4d4] hover:text-[#cbd0bf] transition-colors p-1">
+                        <Paperclip className="w-5 h-5" />
+                      </button>
 
-                    {/* Input Field */}
-                    <div className="flex-1 relative flex items-center">
-                      <textarea
-                        ref={textareaRef}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        placeholder={!hasStartedChat ? "Ask anything..." : "Type your message..."}
-                        className="w-full bg-transparent text-[#e4e4d4] placeholder-[#e4e4d4] placeholder-opacity-70 resize-none outline-none text-sm leading-relaxed min-h-[24px] max-h-[120px] flex items-center"
-                        style={{
-                          paddingTop: "0",
-                          paddingBottom: "0",
-                          lineHeight: "24px",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                        rows={1}
-                      />
+                      {/* Input Field */}
+                      <div className="flex-1 relative flex items-center">
+                        <textarea
+                          ref={textareaRef}
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Ask anything..."
+                          className="w-full bg-transparent text-[#e4e4d4] placeholder-[#e4e4d4] placeholder-opacity-70 resize-none outline-none text-sm leading-relaxed min-h-[24px] max-h-[120px] flex items-center"
+                          style={{
+                            paddingTop: "0",
+                            paddingBottom: "0",
+                            lineHeight: "24px",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                          rows={1}
+                        />
+                      </div>
+
+                      {/* Send Button with Arrow Up */}
+                      <button
+                        type="submit"
+                        disabled={!input.trim() || isLoading}
+                        className="bg-[#cbd0bf] text-[#8a9b69] p-2 rounded-lg hover:bg-opacity-80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                      >
+                        <ArrowUp className="w-5 h-5" />
+                      </button>
                     </div>
-
-                    {/* Send Button with Arrow Up */}
-                    <button
-                      type="submit"
-                      disabled={!input.trim() || isLoading}
-                      className="bg-[#cbd0bf] text-[#8a9b69] p-2 rounded-lg hover:bg-opacity-80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
-                    >
-                      <ArrowUp className="w-5 h-5" />
-                    </button>
                   </div>
-                </div>
-              </form>
+                </form>
 
-              {/* Helper Text - Only show when no messages */}
-              {!hasStartedChat && (
+                {/* Helper Text */}
                 <p className="text-center text-[#8a9b69] opacity-60 mt-6 text-sm">
                   Start typing to begin your conversation...
                 </p>
-              )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
