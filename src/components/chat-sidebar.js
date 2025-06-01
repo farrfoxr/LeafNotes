@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Plus,
   MessageSquare,
@@ -40,6 +40,8 @@ export function ChatSidebar({
   const [searchQuery, setSearchQuery] = useState("")
   const [draggedItem, setDraggedItem] = useState(null)
   const [dragOverTarget, setDragOverTarget] = useState(null)
+  
+  // No complex transition state needed - just use isOpen directly
 
   const toggleFolder = (folderId) => {
     const newExpanded = new Set(expandedFolders)
@@ -95,7 +97,6 @@ export function ChatSidebar({
   }
 
   const handleDragLeave = (e) => {
-    // Only clear if we're leaving the entire drop zone
     if (!e.currentTarget.contains(e.relatedTarget)) {
       setDragOverTarget(null)
     }
@@ -107,7 +108,6 @@ export function ChatSidebar({
 
     if (!draggedItem || draggedItem.type !== "chat") return
 
-    // Move chat to target folder (or unsorted if targetFolderId is null)
     if (onMoveChat) {
       onMoveChat(draggedItem.id, targetFolderId)
     }
@@ -121,7 +121,6 @@ export function ChatSidebar({
   }
 
   const handleNewChatInFolder = (folderId) => {
-    // Ensure folder is expanded when creating a new chat
     if (folderId && !expandedFolders.has(folderId)) {
       setExpandedFolders((prev) => new Set([...prev, folderId]))
     }
@@ -140,10 +139,9 @@ export function ChatSidebar({
         onDragStart={(e) => handleDragStart(e, chat, "chat")}
         onDragEnd={handleDragEnd}
         className={cn(
-          "group flex items-center rounded-lg cursor-pointer transition-all duration-200",
+          "group flex items-center rounded-lg cursor-pointer",
           isActive ? "bg-[#6b886b] text-white shadow-sm" : "hover:bg-[#cbd0bf]/50 text-[#8a9b69]",
           isDragging && "opacity-50",
-          // Enhanced button sizing and positioning
           "px-4 py-3 gap-3 min-h-[44px]",
           isInFolder && "ml-4"
         )}
@@ -151,50 +149,44 @@ export function ChatSidebar({
       >
         <MessageSquare className="flex-shrink-0 w-5 h-5" />
 
-        {isOpen && (
-          <>
-            {isEditing ? (
-              <input
-                value={editingValue}
-                onChange={(e) => setEditingValue(e.target.value)}
-                onBlur={finishEditing}
-                onKeyDown={handleKeyDown}
-                className="flex-1 bg-transparent border-none outline-none text-sm min-w-0"
-                autoFocus
-              />
-            ) : (
-              <span className="flex-1 text-sm truncate font-medium min-w-0">{chat.title}</span>
-            )}
-
-            <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity flex-shrink-0">
-              <button
-                className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  startEditing(chat, "chat")
-                }}
-              >
-                <Edit3 className="w-3.5 h-3.5" />
-              </button>
-              <button
-                className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDeleteChat(chat.id)
-                }}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </>
+        {isEditing ? (
+          <input
+            value={editingValue}
+            onChange={(e) => setEditingValue(e.target.value)}
+            onBlur={finishEditing}
+            onKeyDown={handleKeyDown}
+            className="flex-1 bg-transparent border-none outline-none text-sm min-w-0"
+            autoFocus
+          />
+        ) : (
+          <span className="flex-1 text-sm truncate font-medium min-w-0">{chat.title}</span>
         )}
+
+        <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity flex-shrink-0">
+          <button
+            className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center"
+            onClick={(e) => {
+              e.stopPropagation()
+              startEditing(chat, "chat")
+            }}
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+          </button>
+          <button
+            className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center"
+            onClick={(e) => {
+              e.stopPropagation()
+              onDeleteChat(chat.id)
+            }}
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     )
   }
 
   const renderFolder = (folder) => {
-    if (!isOpen) return null
-
     const isExpanded = expandedFolders.has(folder.id)
     const isEditing = editingItem?.id === folder.id && editingItem?.type === "folder"
     const folderChats = chats.filter((chat) => chat.folderId === folder.id)
@@ -205,10 +197,9 @@ export function ChatSidebar({
       <div key={folder.id} className="mb-1">
         <div
           className={cn(
-            "group flex items-center rounded-lg cursor-pointer transition-all duration-200 min-h-[44px]",
+            "group flex items-center rounded-lg cursor-pointer min-h-[44px]",
             "hover:bg-[#cbd0bf]/50 text-[#8a9b69]",
             isDropTarget && canDrop && "bg-[#6b886b]/20 border-2 border-dashed border-[#6b886b]",
-            // Enhanced button sizing and positioning
             "px-4 py-3 gap-3"
           )}
           onClick={() => !isEditing && toggleFolder(folder.id)}
@@ -246,7 +237,7 @@ export function ChatSidebar({
 
           <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity flex-shrink-0">
             <button
-              className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors flex-shrink-0"
+              className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation()
                 handleNewChatInFolder(folder.id)
@@ -255,7 +246,7 @@ export function ChatSidebar({
               <Plus className="w-3.5 h-3.5" />
             </button>
             <button
-              className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors flex-shrink-0"
+              className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation()
                 startEditing(folder, "folder")
@@ -264,7 +255,7 @@ export function ChatSidebar({
               <Edit3 className="w-3.5 h-3.5" />
             </button>
             <button
-              className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors flex-shrink-0"
+              className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation()
                 onDeleteFolder(folder.id)
@@ -280,10 +271,7 @@ export function ChatSidebar({
     )
   }
 
-  // Sort folders alphabetically
   const sortedFolders = [...folders].sort((a, b) => a.name.localeCompare(b.name))
-
-  // Sort unsorted chats by creation time (newest first)
   const unorganizedChats = chats
     .filter((chat) => !chat.folderId)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -315,7 +303,6 @@ export function ChatSidebar({
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: rgba(138, 155, 105, 0.4);
           border-radius: 2px;
-          transition: all 0.2s ease;
           min-height: 20px;
           background-clip: padding-box;
           border: 1px solid transparent;
@@ -323,58 +310,52 @@ export function ChatSidebar({
         
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(138, 155, 105, 0.6);
-          width: 3px;
         }
         
         .custom-scrollbar::-webkit-scrollbar-corner {
           background: transparent;
         }
-        
-        /* Force shorter scrollbar thumb */
-        .custom-scrollbar::-webkit-scrollbar-thumb:vertical {
-          min-height: 15px;
-          max-height: 30px;
-        }
       `}</style>
 
       <div
         className={cn(
-          "h-screen bg-[#e4e4d4] border-r border-[#cbd0bf]/60 font-monkeytype transition-all duration-300 ease-in-out flex flex-col shadow-sm overflow-hidden",
-          isOpen ? "w-80" : "w-16", // Increased from w-64 to w-80 (320px)
+          "h-screen bg-[#e4e4d4] border-r border-[#cbd0bf]/60 font-monkeytype flex flex-col shadow-sm overflow-hidden",
+          // Clean width transition
+          "transition-[width] duration-300 ease-in-out",
+          isOpen ? "w-80" : "w-16"
         )}
       >
         {/* Header */}
         <div className="flex-shrink-0 border-b border-[#cbd0bf]/40 p-4">
           <div className={cn("flex flex-col gap-3", !isOpen && "items-center")}>
-            {/* Toggle Button - Properly centered in collapsed mode */}
+            {/* Toggle Button */}
             <button
               onClick={onToggle}
               className={cn(
-                "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69] h-10",
+                "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69] h-10",
                 isOpen ? "px-3 w-full" : "w-10 justify-center"
               )}
             >
-              <PanelLeft className={cn("transition-transform duration-300 w-5 h-5", !isOpen && "rotate-180")} />
+              <PanelLeft className={cn("w-5 h-5", !isOpen && "rotate-180")} />
             </button>
 
-            {/* New Chat Button - Properly centered in collapsed mode */}
+            {/* New Chat Button */}
             <button
               onClick={() => handleNewChatInFolder()}
               className={cn(
-                "flex items-center bg-[#6b886b] hover:bg-[#6b886b]/90 text-white rounded-lg transition-all duration-300 font-medium shadow-sm h-10",
+                "flex items-center bg-[#6b886b] hover:bg-[#6b886b]/90 text-white rounded-lg font-medium shadow-sm h-10",
                 isOpen ? "w-full px-3 gap-3" : "w-10 justify-center"
               )}
             >
               <Plus className="w-5 h-5 flex-shrink-0" />
-              <span className={cn(
-                "text-sm transition-all duration-300 whitespace-nowrap overflow-hidden",
-                isOpen ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
-              )}>
-                New Chat
-              </span>
+              {isOpen && (
+                <span className="text-sm whitespace-nowrap">
+                  New Chat
+                </span>
+              )}
             </button>
 
-            {/* Search - Properly centered in collapsed mode */}
+            {/* Search */}
             {isOpen ? (
               <div className="relative w-full h-10">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8a9b69]/60" />
@@ -383,11 +364,11 @@ export function ChatSidebar({
                   placeholder="Search chats..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-full pl-10 pr-3 bg-[#cbd0bf]/30 border border-[#cbd0bf]/40 rounded-lg text-sm text-[#8a9b69] placeholder-[#8a9b69]/60 focus:outline-none focus:ring-2 focus:ring-[#6b886b]/30 focus:border-[#6b886b]/50 transition-all"
+                  className="w-full h-full pl-10 pr-3 bg-[#cbd0bf]/30 border border-[#cbd0bf]/40 rounded-lg text-sm text-[#8a9b69] placeholder-[#8a9b69]/60 focus:outline-none focus:ring-2 focus:ring-[#6b886b]/30 focus:border-[#6b886b]/50"
                 />
               </div>
             ) : (
-              <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69]">
+              <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69]">
                 <Search className="w-5 h-5" />
               </button>
             )}
@@ -398,16 +379,16 @@ export function ChatSidebar({
         <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4 min-h-0 custom-scrollbar">
           <div className={cn("space-y-1", isOpen ? "px-4" : "px-2")}>
             {isOpen ? (
-              <>
+              <div>
                 {/* Folders Section */}
                 <div className="space-y-1">
-                  {/* New Folder Button */}
+                  {/* New Folder Button - FIXED */}
                   <button
                     onClick={onNewFolder}
-                    className="w-full h-10 flex items-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69]/70 transition-all duration-200 text-sm font-medium mb-3 px-4 gap-3"
+                    className="w-full h-10 flex items-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69]/70 text-sm font-medium mb-3 px-4 gap-3 overflow-hidden"
                   >
                     <Folder className="w-5 h-5 flex-shrink-0" />
-                    <span>New Folder</span>
+                    <span className="whitespace-nowrap overflow-hidden">New Folder</span>
                   </button>
 
                   {/* Folders */}
@@ -425,10 +406,10 @@ export function ChatSidebar({
                 {filteredChats.length > 0 && (
                   <div
                     className={cn(
-                      "space-y-1 min-h-[50px] rounded-lg transition-all duration-200",
+                      "space-y-1 min-h-[50px] rounded-lg",
                       isUnsortedDropTarget &&
                         canDropInUnsorted &&
-                        "bg-[#6b886b]/10 border-2 border-dashed border-[#6b886b]",
+                        "bg-[#6b886b]/10 border-2 border-dashed border-[#6b886b]"
                     )}
                     onDragOver={handleDragOver}
                     onDragEnter={(e) => handleDragEnter(e, "unsorted")}
@@ -444,47 +425,44 @@ export function ChatSidebar({
                     {filteredChats.map((chat) => renderChat(chat))}
                   </div>
                 )}
-              </>
+              </div>
             ) : (
-              <>
-                {/* Show only active chat indicator in collapsed mode - perfectly centered buttons */}
-                <div className="flex flex-col space-y-2 items-center w-full">
-                  {unorganizedChats.slice(0, 3).map((chat) => (
-                    <button
-                      key={chat.id}
-                      onClick={() => onChatSelect(chat.id)}
-                      className={cn(
-                        "w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-300 flex-shrink-0",
-                        currentChatId === chat.id 
-                          ? "bg-[#6b886b] text-white shadow-sm" 
-                          : "hover:bg-[#cbd0bf]/50 text-[#8a9b69]"
-                      )}
-                    >
-                      <MessageSquare className="w-5 h-5" />
-                    </button>
-                  ))}
-                </div>
-              </>
+              /* Collapsed state - Show only chat icons */
+              <div className="flex flex-col space-y-2 items-center w-full">
+                {unorganizedChats.slice(0, 3).map((chat) => (
+                  <button
+                    key={chat.id}
+                    onClick={() => onChatSelect(chat.id)}
+                    className={cn(
+                      "w-10 h-10 flex items-center justify-center rounded-lg flex-shrink-0",
+                      currentChatId === chat.id 
+                        ? "bg-[#6b886b] text-white shadow-sm" 
+                        : "hover:bg-[#cbd0bf]/50 text-[#8a9b69]"
+                    )}
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
 
-        {/* Settings at Bottom - Properly centered in collapsed mode */}
+        {/* Settings at Bottom */}
         <div className="flex-shrink-0 border-t border-[#cbd0bf]/40 p-4">
           <div className={cn(!isOpen && "flex justify-center")}>
             <button 
               className={cn(
-                "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69] h-10",
+                "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69] h-10",
                 isOpen ? "w-full px-3 gap-3" : "w-10 justify-center"
               )}
             >
               <Settings className="w-5 h-5 flex-shrink-0" />
-              <span className={cn(
-                "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
-                isOpen ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
-              )}>
-                Settings
-              </span>
+              {isOpen && (
+                <span className="text-sm font-medium whitespace-nowrap">
+                  Settings
+                </span>
+              )}
             </button>
           </div>
         </div>
