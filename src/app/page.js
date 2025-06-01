@@ -201,7 +201,7 @@ export default function ChatInterface() {
         {hasStartedChat ? (
           <>
             {/* Chat Title Header - Fixed position */}
-            <div className="flex-shrink-0 py-4 px-6 bg-[#e4e4d4] border-b border-[#cbd0bf]/30">
+            <div className="flex-shrink-0 py-4 px-6 bg-[#e4e4d4]">
               <h2 className="text-center text-[#8a9b69] text-lg font-normal tracking-wide">{currentChatTitle}</h2>
             </div>
 
