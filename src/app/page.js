@@ -32,7 +32,7 @@ export default function ChatInterface() {
     scrollToBottom()
   }, [messages])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, targetFolderId = null) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
@@ -51,7 +51,7 @@ export default function ChatInterface() {
         title: input.trim().slice(0, 50) + (input.trim().length > 50 ? "..." : ""),
         messages: [userMessage],
         createdAt: new Date(),
-        folderId: null,
+        folderId: targetFolderId || null, // Use the target folder if specified
       }
       setChats((prev) => [newChat, ...prev])
       setCurrentChatId(newChatId)
@@ -120,7 +120,18 @@ export default function ChatInterface() {
   }
 
   const handleNewChat = (folderId = null) => {
-    setCurrentChatId(null)
+    // Create a new chat with the specified folder ID
+    const newChatId = Date.now().toString()
+    const newChat = {
+      id: newChatId,
+      title: "New Chat",
+      messages: [],
+      createdAt: new Date(),
+      folderId: folderId, // Assign to the specified folder
+    }
+
+    setChats((prev) => [newChat, ...prev])
+    setCurrentChatId(newChatId)
     setMessages([])
     setInput("")
   }
@@ -162,8 +173,12 @@ export default function ChatInterface() {
 
   const hasStartedChat = messages.length > 0
 
+  // Get current chat title
+  const currentChat = chats.find((chat) => chat.id === currentChatId)
+  const currentChatTitle = currentChat?.title || ""
+
   return (
-    <div className="min-h-screen bg-[#e4e4d4] font-monkeytype flex">
+    <div className="h-screen bg-[#e4e4d4] font-monkeytype flex overflow-hidden">
       {/* Sidebar */}
       <ChatSidebar
         currentChatId={currentChatId}
@@ -182,20 +197,27 @@ export default function ChatInterface() {
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Chat Messages */}
         {hasStartedChat && (
           <div className="flex-1 overflow-hidden">
-            <div className="max-w-4xl mx-auto px-6 py-6 h-full">
-              <div className="space-y-6 max-h-full overflow-y-auto">
+            <div className="max-w-4xl mx-auto px-6 py-6 h-full overflow-hidden">
+              {/* Chat Title - No border, normal font weight */}
+              {currentChatTitle && (
+                <div className="mb-4 text-center">
+                  <h2 className="text-base font-normal text-[#8a9b69]">{currentChatTitle}</h2>
+                </div>
+              )}
+
+              <div className="space-y-6 h-full overflow-y-auto overflow-x-hidden scrollbar-hide">
                 {messages.map((message) => (
                   <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                        message.role === "user" ? "bg-[#6b886b] text-white" : "bg-[#cbd0bf] text-[#8a9b69]"
+                      className={`max-w-[80%] rounded-2xl px-4 py-3 break-words ${
+                        message.role === "user" ? "bg-[#6b886b] text-white user-message" : "bg-[#cbd0bf] text-[#8a9b69]"
                       }`}
                     >
-                      <p className="text-sm leading-relaxed">{message.content}</p>
+                      <p className="text-sm leading-relaxed break-words">{message.content}</p>
                       <p className="text-xs opacity-70 mt-2">
                         {message.timestamp.toLocaleTimeString([], {
                           hour: "2-digit",
@@ -291,14 +313,21 @@ export default function ChatInterface() {
                     </button>
 
                     {/* Input Field */}
-                    <div className="flex-1 relative">
+                    <div className="flex-1 relative flex items-center">
                       <textarea
                         ref={textareaRef}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder={!hasStartedChat ? "Ask anything..." : "Type your message..."}
-                        className="w-full bg-transparent text-[#e4e4d4] placeholder-[#e4e4d4] placeholder-opacity-70 resize-none outline-none text-sm leading-relaxed min-h-[24px] max-h-[120px]"
+                        className="w-full bg-transparent text-[#e4e4d4] placeholder-[#e4e4d4] placeholder-opacity-70 resize-none outline-none text-sm leading-relaxed min-h-[24px] max-h-[120px] flex items-center"
+                        style={{
+                          paddingTop: "0",
+                          paddingBottom: "0",
+                          lineHeight: "24px",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
                         rows={1}
                       />
                     </div>
