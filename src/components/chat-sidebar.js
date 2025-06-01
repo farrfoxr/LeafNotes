@@ -140,15 +140,16 @@ export function ChatSidebar({
         onDragStart={(e) => handleDragStart(e, chat, "chat")}
         onDragEnd={handleDragEnd}
         className={cn(
-          "group flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200",
+          "group flex items-center rounded-lg cursor-pointer transition-all duration-200",
           isActive ? "bg-[#6b886b] text-white shadow-sm" : "hover:bg-[#cbd0bf]/50 text-[#8a9b69]",
-          isInFolder && "ml-6",
-          !isOpen && "justify-center px-2",
           isDragging && "opacity-50",
+          // Enhanced button sizing and positioning
+          "px-4 py-3 gap-3 min-h-[44px]",
+          isInFolder && "ml-4"
         )}
         onClick={() => !isEditing && onChatSelect(chat.id)}
       >
-        <MessageSquare className={cn("flex-shrink-0", isOpen ? "w-4 h-4" : "w-5 h-5")} />
+        <MessageSquare className="flex-shrink-0 w-5 h-5" />
 
         {isOpen && (
           <>
@@ -172,22 +173,22 @@ export function ChatSidebar({
 
             <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity flex-shrink-0">
               <button
-                className="h-6 w-6 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors"
+                className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors"
                 onClick={(e) => {
                   e.stopPropagation()
                   startEditing(chat, "chat")
                 }}
               >
-                <Edit3 className="w-3 h-3" />
+                <Edit3 className="w-3.5 h-3.5" />
               </button>
               <button
-                className="h-6 w-6 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors"
+                className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors"
                 onClick={(e) => {
                   e.stopPropagation()
                   onDeleteChat(chat.id)
                 }}
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </>
@@ -209,9 +210,11 @@ export function ChatSidebar({
       <div key={folder.id} className="mb-1">
         <div
           className={cn(
-            "group flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 min-h-[36px]",
+            "group flex items-center rounded-lg cursor-pointer transition-all duration-200 min-h-[44px]",
             "hover:bg-[#cbd0bf]/50 text-[#8a9b69]",
             isDropTarget && canDrop && "bg-[#6b886b]/20 border-2 border-dashed border-[#6b886b]",
+            // Enhanced button sizing and positioning
+            "px-4 py-3 gap-3"
           )}
           onClick={() => !isEditing && toggleFolder(folder.id)}
           onDragOver={handleDragOver}
@@ -219,16 +222,16 @@ export function ChatSidebar({
           onDragLeave={handleDragLeave}
           onDrop={(e) => handleDrop(e, folder.id)}
         >
-          <div className="flex items-center gap-2 flex-1 min-w-0">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             {isExpanded ? (
-              <ChevronDown className="w-4 h-4 flex-shrink-0" />
+              <ChevronDown className="w-5 h-5 flex-shrink-0" />
             ) : (
-              <ChevronRight className="w-4 h-4 flex-shrink-0" />
+              <ChevronRight className="w-5 h-5 flex-shrink-0" />
             )}
             {isExpanded ? (
-              <FolderOpen className="w-4 h-4 flex-shrink-0" />
+              <FolderOpen className="w-5 h-5 flex-shrink-0" />
             ) : (
-              <Folder className="w-4 h-4 flex-shrink-0" />
+              <Folder className="w-5 h-5 flex-shrink-0" />
             )}
 
             {isEditing ? (
@@ -253,36 +256,36 @@ export function ChatSidebar({
 
           <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity flex-shrink-0">
             <button
-              className="h-6 w-6 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors flex-shrink-0"
+              className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation()
                 handleNewChatInFolder(folder.id)
               }}
             >
-              <Plus className="w-3 h-3" />
+              <Plus className="w-3.5 h-3.5" />
             </button>
             <button
-              className="h-6 w-6 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors flex-shrink-0"
+              className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation()
                 startEditing(folder, "folder")
               }}
             >
-              <Edit3 className="w-3 h-3" />
+              <Edit3 className="w-3.5 h-3.5" />
             </button>
             <button
-              className="h-6 w-6 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors flex-shrink-0"
+              className="h-7 w-7 rounded-md hover:bg-black/10 flex items-center justify-center transition-colors flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation()
                 onDeleteFolder(folder.id)
               }}
             >
-              <Trash2 className="w-3 h-3" />
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
-        {isExpanded && <div className="ml-4 space-y-1 mt-1">{folderChats.map((chat) => renderChat(chat, true))}</div>}
+        {isExpanded && <div className="ml-6 space-y-1 mt-1">{folderChats.map((chat) => renderChat(chat, true))}</div>}
       </div>
     )
   }
@@ -303,130 +306,197 @@ export function ChatSidebar({
   const canDropInUnsorted = draggedItem?.type === "chat"
 
   return (
-    <div
-      className={cn(
-        "h-screen bg-[#e4e4d4] border-r border-[#cbd0bf]/60 font-monkeytype transition-all duration-300 ease-in-out flex flex-col shadow-sm overflow-hidden",
-        isOpen ? "w-64" : "w-14",
-      )}
-    >
-      {/* Header */}
-      <div className={cn("flex-shrink-0 p-3 border-b border-[#cbd0bf]/40", !isOpen && "px-2")}>
-        <div className="flex flex-col gap-3">
-          {/* Toggle Button */}
-          <button
-            onClick={onToggle}
-            className={cn(
-              "flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[#cbd0bf]/50 transition-colors text-[#8a9b69]",
-              !isOpen && "mx-auto",
-            )}
-          >
-            <PanelLeft className={cn("transition-transform duration-300", isOpen ? "w-4 h-4" : "w-5 h-5 rotate-180")} />
-          </button>
+    <>
+      {/* Custom Scrollbar Styles */}
+      <style jsx>{`
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(138, 155, 105, 0.4) transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(138, 155, 105, 0.4);
+          border-radius: 2px;
+          transition: all 0.2s ease;
+          min-height: 20px;
+          background-clip: padding-box;
+          border: 1px solid transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(138, 155, 105, 0.6);
+          width: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-corner {
+          background: transparent;
+        }
+        
+        /* Force shorter scrollbar thumb */
+        .custom-scrollbar::-webkit-scrollbar-thumb:vertical {
+          min-height: 15px;
+          max-height: 30px;
+        }
+      `}</style>
 
-          {/* New Chat Button */}
-          <button
-            onClick={() => handleNewChatInFolder()}
-            className={cn(
-              "flex items-center gap-3 bg-[#6b886b] hover:bg-[#6b886b]/90 text-white rounded-lg transition-all duration-200 font-medium shadow-sm",
-              isOpen ? "px-3 py-2 justify-start" : "w-8 h-8 justify-center mx-auto",
-            )}
-          >
-            <Plus className={cn(isOpen ? "w-4 h-4" : "w-5 h-5")} />
-            {isOpen && <span className="text-sm">New Chat</span>}
-          </button>
-
-          {/* Search */}
-          {isOpen ? (
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#8a9b69]/60" />
-              <input
-                type="text"
-                placeholder="Search chats..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-[#cbd0bf]/30 border border-[#cbd0bf]/40 rounded-lg text-sm text-[#8a9b69] placeholder-[#8a9b69]/60 focus:outline-none focus:ring-2 focus:ring-[#6b886b]/30 focus:border-[#6b886b]/50 transition-all"
-              />
-            </div>
-          ) : (
-            <button className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-[#cbd0bf]/50 transition-colors text-[#8a9b69] mx-auto">
-              <Search className="w-5 h-5" />
+      <div
+        className={cn(
+          "h-screen bg-[#e4e4d4] border-r border-[#cbd0bf]/60 font-monkeytype transition-all duration-300 ease-in-out flex flex-col shadow-sm overflow-hidden",
+          isOpen ? "w-80" : "w-16", // Increased from w-64 to w-80 (320px)
+        )}
+      >
+        {/* Header */}
+        <div className="flex-shrink-0 border-b border-[#cbd0bf]/40 p-4"> {/* Increased padding */}
+          <div className="flex flex-col gap-3">
+            {/* Toggle Button - Centered in collapsed mode */}
+            <button
+              onClick={onToggle}
+              className={cn(
+                "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69] h-10",
+                isOpen ? "px-3 w-full" : "w-10 justify-center mx-auto"
+              )}
+            >
+              <PanelLeft className={cn("transition-transform duration-300 w-5 h-5", !isOpen && "rotate-180")} />
             </button>
-          )}
-        </div>
-      </div>
 
-      {/* Navigation Items - Scrollable */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden py-3 min-h-0">
-        <div className={cn("space-y-1", isOpen ? "px-3" : "px-2")}>
-          {isOpen ? (
-            <>
-              {/* Folders Section */}
-              <div className="space-y-1">
-                {/* New Folder Button */}
-                <button
-                  onClick={onNewFolder}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69]/70 transition-all duration-200 text-sm font-medium mb-2"
-                >
-                  <Folder className="w-4 h-4" />
-                  <span>New Folder</span>
-                </button>
+            {/* New Chat Button - Centered in collapsed mode */}
+            <button
+              onClick={() => handleNewChatInFolder()}
+              className={cn(
+                "flex items-center bg-[#6b886b] hover:bg-[#6b886b]/90 text-white rounded-lg transition-all duration-300 font-medium shadow-sm h-10",
+                isOpen ? "w-full px-3 gap-3" : "w-10 justify-center mx-auto"
+              )}
+            >
+              <Plus className="w-5 h-5 flex-shrink-0" />
+              <span className={cn(
+                "text-sm transition-all duration-300 whitespace-nowrap overflow-hidden",
+                isOpen ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
+              )}>
+                New Chat
+              </span>
+            </button>
 
-                {/* Folders */}
-                {sortedFolders.map(renderFolder)}
+            {/* Search - Centered in collapsed mode */}
+            {isOpen ? (
+              <div className="relative w-full h-10">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8a9b69]/60" />
+                <input
+                  type="text"
+                  placeholder="Search chats..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full h-full pl-10 pr-3 bg-[#cbd0bf]/30 border border-[#cbd0bf]/40 rounded-lg text-sm text-[#8a9b69] placeholder-[#8a9b69]/60 focus:outline-none focus:ring-2 focus:ring-[#6b886b]/30 focus:border-[#6b886b]/50 transition-all"
+                />
               </div>
+            ) : (
+              <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69] mx-auto">
+                <Search className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+        </div>
 
-              {/* Section Divider */}
-              {(sortedFolders.length > 0 || filteredChats.length > 0) && (
-                <div className="my-4">
-                  <div className="h-px bg-[#cbd0bf]/40 mx-2"></div>
+        {/* Navigation Items - Scrollable with Custom Scrollbar */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden pt-4 min-h-0 custom-scrollbar">
+          <div className={cn("space-y-1", isOpen ? "px-4" : "px-2")}> {/* Increased padding */}
+            {isOpen ? (
+              <>
+                {/* Folders Section */}
+                <div className="space-y-1">
+                  {/* New Folder Button */}
+                  <button
+                    onClick={onNewFolder}
+                    className="w-full h-10 flex items-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69]/70 transition-all duration-200 text-sm font-medium mb-3 px-4 gap-3"
+                  >
+                    <Folder className="w-5 h-5 flex-shrink-0" />
+                    <span>New Folder</span>
+                  </button>
+
+                  {/* Folders */}
+                  {sortedFolders.map(renderFolder)}
                 </div>
-              )}
 
-              {/* Unsorted Chats Section */}
-              {filteredChats.length > 0 && (
-                <div
-                  className={cn(
-                    "space-y-1 min-h-[40px] rounded-lg transition-all duration-200",
-                    isUnsortedDropTarget &&
-                      canDropInUnsorted &&
-                      "bg-[#6b886b]/10 border-2 border-dashed border-[#6b886b]",
-                  )}
-                  onDragOver={handleDragOver}
-                  onDragEnter={(e) => handleDragEnter(e, "unsorted")}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) => handleDrop(e, null)}
-                >
-                  {/* Section Label */}
-                  <div className="px-3 py-1">
-                    <span className="text-xs font-medium text-[#8a9b69]/60 uppercase tracking-wide">Recent Chats</span>
+                {/* Section Divider */}
+                {(sortedFolders.length > 0 || filteredChats.length > 0) && (
+                  <div className="my-4">
+                    <div className="h-px bg-[#cbd0bf]/40 mx-2"></div>
                   </div>
+                )}
 
-                  {/* Unsorted Chats */}
-                  {filteredChats.map((chat) => renderChat(chat))}
+                {/* Unsorted Chats Section */}
+                {filteredChats.length > 0 && (
+                  <div
+                    className={cn(
+                      "space-y-1 min-h-[50px] rounded-lg transition-all duration-200",
+                      isUnsortedDropTarget &&
+                        canDropInUnsorted &&
+                        "bg-[#6b886b]/10 border-2 border-dashed border-[#6b886b]",
+                    )}
+                    onDragOver={handleDragOver}
+                    onDragEnter={(e) => handleDragEnter(e, "unsorted")}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, null)}
+                  >
+                    {/* Section Label */}
+                    <div className="px-4 py-2">
+                      <span className="text-xs font-medium text-[#8a9b69]/60 uppercase tracking-wide">Recent Chats</span>
+                    </div>
+
+                    {/* Unsorted Chats */}
+                    {filteredChats.map((chat) => renderChat(chat))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Show only active chat indicator in collapsed mode - centered buttons */}
+                <div className="flex flex-col space-y-2 items-center">
+                  {unorganizedChats.slice(0, 3).map((chat) => (
+                    <button
+                      key={chat.id}
+                      onClick={() => onChatSelect(chat.id)}
+                      className={cn(
+                        "w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-300",
+                        currentChatId === chat.id 
+                          ? "bg-[#6b886b] text-white shadow-sm" 
+                          : "hover:bg-[#cbd0bf]/50 text-[#8a9b69]"
+                      )}
+                    >
+                      <MessageSquare className="w-5 h-5" />
+                    </button>
+                  ))}
                 </div>
-              )}
-            </>
-          ) : (
-            <>
-              {/* Show only active chat indicator in collapsed mode */}
-              {unorganizedChats.slice(0, 3).map((chat) => renderChat(chat))}
-            </>
-          )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Settings at Bottom - Centered in collapsed mode */}
+        <div className="flex-shrink-0 border-t border-[#cbd0bf]/40 p-4"> {/* Increased padding */}
+          <button 
+            className={cn(
+              "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 transition-all duration-300 text-[#8a9b69] h-10",
+              isOpen ? "w-full px-3 gap-3" : "w-10 justify-center mx-auto"
+            )}
+          >
+            <Settings className="w-5 h-5 flex-shrink-0" />
+            <span className={cn(
+              "text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden",
+              isOpen ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
+            )}>
+              Settings
+            </span>
+          </button>
         </div>
       </div>
-
-      {/* Settings at Bottom - Fixed */}
-      <div className={cn("flex-shrink-0 p-3 border-t border-[#cbd0bf]/40", !isOpen && "px-2")}>
-        <button
-          className={cn(
-            "flex items-center gap-3 w-full rounded-lg hover:bg-[#cbd0bf]/50 transition-colors text-[#8a9b69]",
-            isOpen ? "px-3 py-2 justify-start" : "w-8 h-8 justify-center mx-auto",
-          )}
-        >
-          <Settings className={cn(isOpen ? "w-4 h-4" : "w-5 h-5")} />
-          {isOpen && <span className="text-sm font-medium">Settings</span>}
-        </button>
-      </div>
-    </div>
+    </>
   )
 }
