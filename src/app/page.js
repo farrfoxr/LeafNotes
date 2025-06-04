@@ -32,6 +32,12 @@ export default function ChatInterface() {
     scrollToBottom()
   }, [messages])
 
+  // Helper function to generate chat title from user input
+  const generateChatTitle = (userInput) => {
+    const trimmedInput = userInput.trim()
+    return trimmedInput.length > 50 ? trimmedInput.slice(0, 50) + "..." : trimmedInput
+  }
+
   const handleSubmit = async (e, targetFolderId = null) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
@@ -43,26 +49,37 @@ export default function ChatInterface() {
       timestamp: new Date(),
     }
 
+    const chatTitle = generateChatTitle(input.trim())
+
     // If this is the first message and no current chat, create a new chat
     if (!currentChatId) {
       const newChatId = Date.now().toString()
       const newChat = {
         id: newChatId,
-        title: input.trim().slice(0, 50) + (input.trim().length > 50 ? "..." : ""),
+        title: chatTitle,
         messages: [userMessage],
         createdAt: new Date(),
-        folderId: targetFolderId || null, // Use the target folder if specified
+        folderId: targetFolderId || null,
       }
       setChats((prev) => [newChat, ...prev])
       setCurrentChatId(newChatId)
       setMessages([userMessage])
     } else {
-      // Add to existing chat
+      // Add to existing chat and update title if it's still "New Chat"
       setMessages((prev) => [...prev, userMessage])
       setChats((prev) =>
-        prev.map((chat) =>
-          chat.id === currentChatId ? { ...chat, messages: [...(chat.messages || []), userMessage] } : chat,
-        ),
+        prev.map((chat) => {
+          if (chat.id === currentChatId) {
+            // Update title if it's still "New Chat" or if this is the first user message
+            const shouldUpdateTitle = chat.title === "New Chat" || (chat.messages && chat.messages.length === 0)
+            return {
+              ...chat,
+              title: shouldUpdateTitle ? chatTitle : chat.title,
+              messages: [...(chat.messages || []), userMessage]
+            }
+          }
+          return chat
+        })
       )
     }
 
@@ -127,7 +144,7 @@ export default function ChatInterface() {
       title: "New Chat",
       messages: [],
       createdAt: new Date(),
-      folderId: folderId, // Assign to the specified folder
+      folderId: folderId,
     }
 
     setChats((prev) => [newChat, ...prev])
