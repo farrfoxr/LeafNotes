@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import {
   Plus,
   MessageSquare,
@@ -33,6 +33,7 @@ export function ChatSidebar({
   onMoveChat,
   isOpen,
   onToggle,
+  onSettingsClick, // Add this prop
 }) {
   const [expandedFolders, setExpandedFolders] = useState(new Set())
   const [editingItem, setEditingItem] = useState(null)
@@ -40,7 +41,7 @@ export function ChatSidebar({
   const [searchQuery, setSearchQuery] = useState("")
   const [draggedItem, setDraggedItem] = useState(null)
   const [dragOverTarget, setDragOverTarget] = useState(null)
-  
+
   // No complex transition state needed - just use isOpen directly
 
   const toggleFolder = (folderId) => {
@@ -140,10 +141,12 @@ export function ChatSidebar({
         onDragEnd={handleDragEnd}
         className={cn(
           "group flex items-center rounded-lg cursor-pointer",
-          isActive ? "bg-[#6b886b] text-white shadow-sm" : "hover:bg-[#cbd0bf]/50 text-[#8a9b69]",
+          isActive
+            ? "bg-theme-primary text-theme-text-on-primary shadow-sm"
+            : "hover:bg-theme-hover/50 text-theme-text",
           isDragging && "opacity-50",
           "px-4 py-3 gap-3 min-h-[44px]",
-          isInFolder && "ml-4"
+          isInFolder && "ml-4",
         )}
         onClick={() => !isEditing && onChatSelect(chat.id)}
       >
@@ -198,9 +201,9 @@ export function ChatSidebar({
         <div
           className={cn(
             "group flex items-center rounded-lg cursor-pointer min-h-[44px]",
-            "hover:bg-[#cbd0bf]/50 text-[#8a9b69]",
-            isDropTarget && canDrop && "bg-[#6b886b]/20 border-2 border-dashed border-[#6b886b]",
-            "px-4 py-3 gap-3"
+            "hover:bg-theme-hover/50 text-theme-text",
+            isDropTarget && canDrop && "bg-theme-primary/20 border-2 border-dashed border-theme-primary",
+            "px-4 py-3 gap-3",
           )}
           onClick={() => !isEditing && toggleFolder(folder.id)}
           onDragOver={handleDragOver}
@@ -289,7 +292,7 @@ export function ChatSidebar({
       <style jsx>{`
         .custom-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: rgba(138, 155, 105, 0.4) transparent;
+          scrollbar-color: hsl(var(--theme-text) / 0.4) transparent;
         }
         
         .custom-scrollbar::-webkit-scrollbar {
@@ -301,7 +304,7 @@ export function ChatSidebar({
         }
         
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(138, 155, 105, 0.4);
+          background: hsl(var(--theme-text) / 0.4);
           border-radius: 2px;
           min-height: 20px;
           background-clip: padding-box;
@@ -309,7 +312,7 @@ export function ChatSidebar({
         }
         
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(138, 155, 105, 0.6);
+          background: hsl(var(--theme-text) / 0.6);
         }
         
         .custom-scrollbar::-webkit-scrollbar-corner {
@@ -319,21 +322,21 @@ export function ChatSidebar({
 
       <div
         className={cn(
-          "h-screen bg-[#e4e4d4] border-r border-[#cbd0bf]/60 font-monkeytype flex flex-col shadow-sm overflow-hidden",
+          "h-screen bg-theme-bg border-r border-theme-border/60 font-monkeytype flex flex-col shadow-sm overflow-hidden",
           // Clean width transition
           "transition-[width] duration-300 ease-in-out",
-          isOpen ? "w-80" : "w-16"
+          isOpen ? "w-80" : "w-16",
         )}
       >
         {/* Header */}
-        <div className="flex-shrink-0 border-b border-[#cbd0bf]/40 p-4">
+        <div className="flex-shrink-0 border-b border-theme-border/40 p-4">
           <div className={cn("flex flex-col gap-3", !isOpen && "items-center")}>
             {/* Toggle Button */}
             <button
               onClick={onToggle}
               className={cn(
-                "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69] h-10",
-                isOpen ? "px-3 w-full" : "w-10 justify-center"
+                "flex items-center rounded-lg hover:bg-theme-hover/50 text-theme-text h-10",
+                isOpen ? "px-3 w-full" : "w-10 justify-center",
               )}
             >
               <PanelLeft className={cn("w-5 h-5", !isOpen && "rotate-180")} />
@@ -343,32 +346,28 @@ export function ChatSidebar({
             <button
               onClick={() => handleNewChatInFolder()}
               className={cn(
-                "flex items-center bg-[#6b886b] hover:bg-[#6b886b]/90 text-white rounded-lg font-medium shadow-sm h-10",
-                isOpen ? "w-full px-3 gap-3" : "w-10 justify-center"
+                "flex items-center bg-theme-primary hover:bg-theme-primary/90 text-theme-text-on-primary rounded-lg font-medium shadow-sm h-10",
+                isOpen ? "w-full px-3 gap-3" : "w-10 justify-center",
               )}
             >
               <Plus className="w-5 h-5 flex-shrink-0" />
-              {isOpen && (
-                <span className="text-sm whitespace-nowrap">
-                  New Chat
-                </span>
-              )}
+              {isOpen && <span className="text-sm whitespace-nowrap">New Chat</span>}
             </button>
 
             {/* Search */}
             {isOpen ? (
               <div className="relative w-full h-10">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#8a9b69]/60" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-theme-text/60" />
                 <input
                   type="text"
                   placeholder="Search chats..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-full pl-10 pr-3 bg-[#cbd0bf]/30 border border-[#cbd0bf]/40 rounded-lg text-sm text-[#8a9b69] placeholder-[#8a9b69]/60 focus:outline-none focus:ring-2 focus:ring-[#6b886b]/30 focus:border-[#6b886b]/50"
+                  className="w-full h-full pl-10 pr-3 bg-theme-secondary/30 border border-theme-border/40 rounded-lg text-sm text-theme-text placeholder-theme-text/60 focus:outline-none focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary/50"
                 />
               </div>
             ) : (
-              <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69]">
+              <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-theme-hover/50 text-theme-text">
                 <Search className="w-5 h-5" />
               </button>
             )}
@@ -385,7 +384,7 @@ export function ChatSidebar({
                   {/* New Folder Button - FIXED */}
                   <button
                     onClick={onNewFolder}
-                    className="w-full h-10 flex items-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69]/70 text-sm font-medium mb-3 px-4 gap-3 overflow-hidden"
+                    className="w-full h-10 flex items-center rounded-lg hover:bg-theme-hover/50 text-theme-text/70 text-sm font-medium mb-3 px-4 gap-3 overflow-hidden"
                   >
                     <Folder className="w-5 h-5 flex-shrink-0" />
                     <span className="whitespace-nowrap overflow-hidden">New Folder</span>
@@ -398,7 +397,7 @@ export function ChatSidebar({
                 {/* Section Divider */}
                 {(sortedFolders.length > 0 || filteredChats.length > 0) && (
                   <div className="my-4">
-                    <div className="h-px bg-[#cbd0bf]/40 mx-2"></div>
+                    <div className="h-px bg-theme-border/40 mx-2"></div>
                   </div>
                 )}
 
@@ -409,7 +408,7 @@ export function ChatSidebar({
                       "space-y-1 min-h-[50px] rounded-lg",
                       isUnsortedDropTarget &&
                         canDropInUnsorted &&
-                        "bg-[#6b886b]/10 border-2 border-dashed border-[#6b886b]"
+                        "bg-theme-primary/10 border-2 border-dashed border-theme-primary",
                     )}
                     onDragOver={handleDragOver}
                     onDragEnter={(e) => handleDragEnter(e, "unsorted")}
@@ -418,7 +417,9 @@ export function ChatSidebar({
                   >
                     {/* Section Label */}
                     <div className="px-4 py-2">
-                      <span className="text-xs font-medium text-[#8a9b69]/60 uppercase tracking-wide">Recent Chats</span>
+                      <span className="text-xs font-medium text-theme-text/60 uppercase tracking-wide">
+                        Recent Chats
+                      </span>
                     </div>
 
                     {/* Unsorted Chats */}
@@ -435,9 +436,9 @@ export function ChatSidebar({
                     onClick={() => onChatSelect(chat.id)}
                     className={cn(
                       "w-10 h-10 flex items-center justify-center rounded-lg flex-shrink-0",
-                      currentChatId === chat.id 
-                        ? "bg-[#6b886b] text-white shadow-sm" 
-                        : "hover:bg-[#cbd0bf]/50 text-[#8a9b69]"
+                      currentChatId === chat.id
+                        ? "bg-theme-primary text-theme-text-on-primary shadow-sm"
+                        : "hover:bg-theme-hover/50 text-theme-text",
                     )}
                   >
                     <MessageSquare className="w-5 h-5" />
@@ -449,20 +450,17 @@ export function ChatSidebar({
         </div>
 
         {/* Settings at Bottom */}
-        <div className="flex-shrink-0 border-t border-[#cbd0bf]/40 p-4">
+        <div className="flex-shrink-0 border-t border-theme-border/40 p-4">
           <div className={cn(!isOpen && "flex justify-center")}>
-            <button 
+            <button
+              onClick={onSettingsClick} // Change this line
               className={cn(
-                "flex items-center rounded-lg hover:bg-[#cbd0bf]/50 text-[#8a9b69] h-10",
-                isOpen ? "w-full px-3 gap-3" : "w-10 justify-center"
+                "flex items-center rounded-lg hover:bg-theme-hover/50 text-theme-text h-10",
+                isOpen ? "w-full px-3 gap-3" : "w-10 justify-center",
               )}
             >
               <Settings className="w-5 h-5 flex-shrink-0" />
-              {isOpen && (
-                <span className="text-sm font-medium whitespace-nowrap">
-                  Settings
-                </span>
-              )}
+              {isOpen && <span className="text-sm font-medium whitespace-nowrap">Settings</span>}
             </button>
           </div>
         </div>

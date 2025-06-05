@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { ArrowUp, Paperclip, ChevronDown } from "lucide-react"
 import { ChatSidebar } from "@/components/chat-sidebar"
+import { SettingsModal } from "@/components/settings-modal"
 
 function cn(...inputs) {
   // Simple className merger for this project
@@ -19,6 +20,7 @@ export default function ChatInterface() {
   const [currentChatId, setCurrentChatId] = useState(null)
   const [chats, setChats] = useState([])
   const [folders, setFolders] = useState([])
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
 
@@ -75,11 +77,11 @@ export default function ChatInterface() {
             return {
               ...chat,
               title: shouldUpdateTitle ? chatTitle : chat.title,
-              messages: [...(chat.messages || []), userMessage]
+              messages: [...(chat.messages || []), userMessage],
             }
           }
           return chat
-        })
+        }),
       )
     }
 
@@ -195,7 +197,7 @@ export default function ChatInterface() {
   const currentChatTitle = currentChat?.title || "New Chat"
 
   return (
-    <div className="h-screen bg-[#e4e4d4] font-monkeytype flex overflow-hidden">
+    <div className="h-screen bg-theme-bg font-monkeytype flex overflow-hidden">
       {/* Sidebar */}
       <ChatSidebar
         currentChatId={currentChatId}
@@ -211,6 +213,7 @@ export default function ChatInterface() {
         onMoveChat={handleMoveChat}
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onSettingsClick={() => setSettingsOpen(true)}
       />
 
       {/* Main Content */}
@@ -218,8 +221,8 @@ export default function ChatInterface() {
         {hasStartedChat ? (
           <>
             {/* Chat Title Header - Fixed position */}
-            <div className="flex-shrink-0 py-4 px-6 bg-[#e4e4d4]">
-              <h2 className="text-center text-[#8a9b69] text-lg font-normal tracking-wide">{currentChatTitle}</h2>
+            <div className="flex-shrink-0 py-4 px-6 bg-theme-bg">
+              <h2 className="text-center text-theme-text text-lg font-normal tracking-wide">{currentChatTitle}</h2>
             </div>
 
             {/* Messages Container - Flexible height */}
@@ -234,7 +237,9 @@ export default function ChatInterface() {
                       >
                         <div
                           className={`max-w-[80%] rounded-2xl px-4 py-3 break-words ${
-                            message.role === "user" ? "bg-[#6b886b] text-white" : "bg-[#cbd0bf] text-[#8a9b69]"
+                            message.role === "user"
+                              ? "bg-theme-primary text-theme-text-on-primary user-message"
+                              : "bg-theme-secondary text-theme-text-on-secondary"
                           }`}
                         >
                           <p className="text-sm leading-relaxed break-words">{message.content}</p>
@@ -249,15 +254,15 @@ export default function ChatInterface() {
                     ))}
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="bg-[#cbd0bf] text-[#8a9b69] rounded-2xl px-4 py-3">
+                        <div className="bg-theme-secondary text-theme-text-on-secondary rounded-2xl px-4 py-3">
                           <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-[#8a9b69] rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-theme-text-on-secondary rounded-full animate-bounce"></div>
                             <div
-                              className="w-2 h-2 bg-[#8a9b69] rounded-full animate-bounce"
+                              className="w-2 h-2 bg-theme-text-on-secondary rounded-full animate-bounce"
                               style={{ animationDelay: "0.1s" }}
                             ></div>
                             <div
-                              className="w-2 h-2 bg-[#8a9b69] rounded-full animate-bounce"
+                              className="w-2 h-2 bg-theme-text-on-secondary rounded-full animate-bounce"
                               style={{ animationDelay: "0.2s" }}
                             ></div>
                           </div>
@@ -270,13 +275,16 @@ export default function ChatInterface() {
               </div>
 
               {/* Input Section - Fixed at bottom */}
-              <div className="flex-shrink-0 p-4 bg-[#e4e4d4]">
+              <div className="flex-shrink-0 p-4 bg-theme-bg">
                 <div className="max-w-3xl mx-auto">
                   <form onSubmit={handleSubmit} className="relative">
-                    <div className="bg-[#6b886b] rounded-2xl p-4 shadow-lg">
+                    <div className="bg-theme-primary rounded-2xl p-4 shadow-lg">
                       <div className="flex items-center gap-3">
                         {/* Attachment Button */}
-                        <button type="button" className="text-[#e4e4d4] hover:text-[#cbd0bf] transition-colors p-1">
+                        <button
+                          type="button"
+                          className="text-theme-text-on-primary hover:text-theme-text-on-primary/80 transition-colors p-1"
+                        >
                           <Paperclip className="w-5 h-5" />
                         </button>
 
@@ -288,7 +296,7 @@ export default function ChatInterface() {
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
                             placeholder="Type your message..."
-                            className="w-full bg-transparent text-[#e4e4d4] placeholder-[#e4e4d4] placeholder-opacity-70 resize-none outline-none text-sm leading-relaxed min-h-[24px] max-h-[120px] flex items-center"
+                            className="w-full bg-transparent text-theme-text-on-primary placeholder-theme-text-on-primary/70 resize-none outline-none text-sm leading-relaxed min-h-[24px] max-h-[120px] flex items-center"
                             style={{
                               paddingTop: "0",
                               paddingBottom: "0",
@@ -304,7 +312,7 @@ export default function ChatInterface() {
                         <button
                           type="submit"
                           disabled={!input.trim() || isLoading}
-                          className="bg-[#cbd0bf] text-[#8a9b69] p-2 rounded-lg hover:bg-opacity-80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                          className="bg-theme-secondary text-theme-text-on-secondary p-2 rounded-lg hover:bg-theme-secondary/80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
                         >
                           <ArrowUp className="w-5 h-5" />
                         </button>
@@ -321,20 +329,20 @@ export default function ChatInterface() {
             <div className="max-w-4xl mx-auto px-6 w-full">
               {/* Header */}
               <div className="text-center mb-16">
-                <h1 className="text-5xl md:text-6xl font-light text-[#8a9b69] tracking-wide">Leaf Notes</h1>
+                <h1 className="text-5xl md:text-6xl font-light text-theme-text tracking-wide">Leaf Notes</h1>
               </div>
 
               {/* Input Section */}
               <div className="relative max-w-3xl mx-auto">
                 <form onSubmit={handleSubmit} className="relative">
-                  <div className="bg-[#6b886b] rounded-2xl p-4 shadow-lg">
+                  <div className="bg-theme-primary rounded-2xl p-4 shadow-lg">
                     <div className="flex items-center gap-3">
                       {/* Model Selector */}
                       <div className="relative">
                         <button
                           type="button"
                           onClick={() => setShowModelDropdown(!showModelDropdown)}
-                          className="flex items-center gap-2 bg-[#cbd0bf] text-[#8a9b69] px-3 py-2 rounded-lg text-sm hover:bg-opacity-80 transition-all duration-200"
+                          className="flex items-center gap-2 bg-theme-secondary text-theme-text-on-secondary px-3 py-2 rounded-lg text-sm hover:bg-theme-secondary/80 transition-all duration-200"
                         >
                           <span>{selectedModel}</span>
                           <ChevronDown
@@ -342,9 +350,9 @@ export default function ChatInterface() {
                           />
                         </button>
 
-                        {/* Animated Dropdown */}
+                        {/* Animated Dropdown - Updated with theme-aware colors */}
                         <div
-                          className={`absolute bottom-full mb-2 left-0 bg-white rounded-lg shadow-lg border border-[#cbd0bf] min-w-[120px] z-10 transition-all duration-200 origin-bottom ${
+                          className={`absolute bottom-full mb-2 left-0 bg-[hsl(var(--theme-dropdown-bg))] rounded-lg shadow-lg border border-theme-border min-w-[120px] z-10 transition-all duration-200 origin-bottom ${
                             showModelDropdown
                               ? "opacity-100 scale-100 translate-y-0"
                               : "opacity-0 scale-95 translate-y-2 pointer-events-none"
@@ -358,7 +366,7 @@ export default function ChatInterface() {
                                 setSelectedModel(model)
                                 setShowModelDropdown(false)
                               }}
-                              className="w-full text-left px-3 py-2 text-sm text-[#8a9b69] hover:bg-[#e4e4d4] transition-colors first:rounded-t-lg last:rounded-b-lg"
+                              className="w-full text-left px-3 py-2 text-sm text-[hsl(var(--theme-dropdown-text))] hover:bg-[hsl(var(--theme-dropdown-hover))] transition-colors first:rounded-t-lg last:rounded-b-lg"
                               style={{
                                 transitionDelay: showModelDropdown ? `${index * 50}ms` : "0ms",
                               }}
@@ -370,7 +378,10 @@ export default function ChatInterface() {
                       </div>
 
                       {/* Attachment Button */}
-                      <button type="button" className="text-[#e4e4d4] hover:text-[#cbd0bf] transition-colors p-1">
+                      <button
+                        type="button"
+                        className="text-theme-text-on-primary hover:text-theme-text-on-primary/80 transition-colors p-1"
+                      >
                         <Paperclip className="w-5 h-5" />
                       </button>
 
@@ -382,7 +393,7 @@ export default function ChatInterface() {
                           onChange={(e) => setInput(e.target.value)}
                           onKeyDown={handleKeyDown}
                           placeholder="Ask anything..."
-                          className="w-full bg-transparent text-[#e4e4d4] placeholder-[#e4e4d4] placeholder-opacity-70 resize-none outline-none text-sm leading-relaxed min-h-[24px] max-h-[120px] flex items-center"
+                          className="w-full bg-transparent text-theme-text-on-primary placeholder-theme-text-on-primary/70 resize-none outline-none text-sm leading-relaxed min-h-[24px] max-h-[120px] flex items-center"
                           style={{
                             paddingTop: "0",
                             paddingBottom: "0",
@@ -398,7 +409,7 @@ export default function ChatInterface() {
                       <button
                         type="submit"
                         disabled={!input.trim() || isLoading}
-                        className="bg-[#cbd0bf] text-[#8a9b69] p-2 rounded-lg hover:bg-opacity-80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
+                        className="bg-theme-secondary text-theme-text-on-secondary p-2 rounded-lg hover:bg-theme-secondary/80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
                       >
                         <ArrowUp className="w-5 h-5" />
                       </button>
@@ -407,7 +418,7 @@ export default function ChatInterface() {
                 </form>
 
                 {/* Helper Text */}
-                <p className="text-center text-[#8a9b69] opacity-60 mt-6 text-sm">
+                <p className="text-center text-theme-text opacity-60 mt-6 text-sm">
                   Start typing to begin your conversation...
                 </p>
               </div>
@@ -415,6 +426,9 @@ export default function ChatInterface() {
           </div>
         )}
       </div>
+
+      {/* Settings Modal */}
+      <SettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   )
 }

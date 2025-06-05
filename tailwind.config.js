@@ -1,9 +1,9 @@
 const config = {
   darkMode: ["class"],
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
@@ -62,11 +62,20 @@ const config = {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        leaf: {
-          bg: "#e4e4d4",
-          text: "#8a9b69",
-          primary: "#6b886b",
-          secondary: "#cbd0bf",
+        // Theme-aware color system
+        theme: {
+          bg: "hsl(var(--theme-bg))",
+          surface: "hsl(var(--theme-surface))",
+          primary: "hsl(var(--theme-primary))",
+          secondary: "hsl(var(--theme-secondary))",
+          text: "hsl(var(--theme-text))",
+          "text-muted": "hsl(var(--theme-text-muted))",
+          "text-on-primary": "hsl(var(--theme-text-on-primary))",
+          "text-on-secondary": "hsl(var(--theme-text-on-secondary))",
+          border: "hsl(var(--theme-border))",
+          "border-muted": "hsl(var(--theme-border-muted))",
+          hover: "hsl(var(--theme-hover))",
+          active: "hsl(var(--theme-active))",
         },
       },
       borderRadius: {

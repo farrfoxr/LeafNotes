@@ -47,7 +47,33 @@ body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Default Theme - Leaf/Nature Theme - EXACT ORIGINAL COLORS */
+    --theme-bg: 75 20% 89%; /* #e4e4d4 */
+    --theme-surface: 75 20% 89%; /* #e4e4d4 */
+    --theme-primary: 120, 12%, 48%; /* #6b886b suppsoed to be 120, 12%, 48% for all this shade of hex*/ 
+    --theme-secondary: 75 20% 79%; /* #cbd0bf */
+    --theme-text: 120 12% 48%; /* #8a9b69 Darker for better readability */
+    --theme-text-muted: 120 12% 45%; /* #8a9b69 Slightly lighter for muted text */
+    --theme-text-on-primary: 75 20% 89%; /* #e4e4d4 */
+    --theme-text-on-secondary: 120 12% 35%; /* #8a9b69 */
+    --theme-border: 75 20% 79%; /* #cbd0bf */
+    --theme-border-muted: 75 20% 79%; /* #cbd0bf */
+    --theme-hover: 75 20% 79%; /* #cbd0bf */
+    --theme-active: 120, 12%, 48%; /* #6b886b */
+
+    /* Dropdown colors */
+    --theme-dropdown-bg: 0 0% 100%; /* white */
+    --theme-dropdown-text: 75 20% 51%; /* #8a9b69 */
+    --theme-dropdown-hover: 75 20% 89%; /* #e4e4d4 */
+
+    /* Selection colors */
+    --theme-selection-bg: 95 15% 47%; /* #6b886b */
+    --theme-selection-text: 75 20% 89%; /* #e4e4d4 */
+    --theme-selection-user-bg: 95 15% 47% / 0.3; /* #6b886b with opacity */
+    --theme-selection-user-text: 0 0% 100%; /* white */
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -81,6 +107,220 @@ body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Dark Theme */
+    --theme-bg: 240 10% 8%;
+    --theme-surface: 240 10% 12%;
+    --theme-primary: 95 15% 47%;
+    --theme-secondary: 240 10% 20%;
+    --theme-text: 75 20% 70%;
+    --theme-text-muted: 75 20% 50%;
+    --theme-text-on-primary: 75 20% 88%;
+    --theme-text-on-secondary: 75 20% 70%;
+    --theme-border: 240 10% 20%;
+    --theme-border-muted: 240 10% 15%;
+    --theme-hover: 240 10% 25%;
+    --theme-active: 95 15% 47%;
+
+    /* Dropdown colors */
+    --theme-dropdown-bg: 240 10% 15%;
+    --theme-dropdown-text: 75 20% 70%;
+    --theme-dropdown-hover: 240 10% 20%;
+
+    /* Selection colors */
+    --theme-selection-bg: 95 15% 47%;
+    --theme-selection-text: 75 20% 88%;
+    --theme-selection-user-bg: 95 15% 47% / 0.3;
+    --theme-selection-user-text: 0 0% 100%;
+  }
+
+  /* Ocean Theme */
+  .theme-ocean {
+    --theme-bg: 200 20% 88%; /* #d4e4e4 */
+    --theme-surface: 200 20% 88%;
+    --theme-primary: 200 50% 45%; /* #4a90a4 */
+    --theme-secondary: 200 20% 78%; /* #a4c3cc */
+    --theme-text: 200 30% 40%;
+    --theme-text-muted: 200 30% 40%;
+    --theme-text-on-primary: 200 20% 88%;
+    --theme-text-on-secondary: 200 30% 40%;
+    --theme-border: 200 20% 78%;
+    --theme-border-muted: 200 20% 78%;
+    --theme-hover: 200 20% 78%;
+    --theme-active: 200 50% 45%;
+
+    /* Dropdown colors */
+    --theme-dropdown-bg: 0 0% 100%;
+    --theme-dropdown-text: 200 30% 40%;
+    --theme-dropdown-hover: 200 20% 88%;
+
+    /* Selection colors */
+    --theme-selection-bg: 200 50% 45%;
+    --theme-selection-text: 200 20% 88%;
+    --theme-selection-user-bg: 200 50% 45% / 0.3;
+    --theme-selection-user-text: 0 0% 100%;
+  }
+
+  /* Cherry Witch Theme */
+  .theme-cherry-witch {
+    --theme-bg: 5 35% 91%; /* #f3dbda */
+    --theme-surface: 5 35% 91%;
+    --theme-primary: 155 15% 40%; /* #56786a */
+    --theme-secondary: 15 35% 75%; /* #ddb4a7 */
+    --theme-text: 155 15% 40%; /* #56786a */
+    --theme-text-muted: 155 15% 40%;
+    --theme-text-on-primary: 5 35% 91%;
+    --theme-text-on-secondary: 155 15% 40%;
+    --theme-border: 15 35% 75%;
+    --theme-border-muted: 15 35% 75%;
+    --theme-hover: 15 35% 75%;
+    --theme-active: 155 15% 40%;
+
+    /* Dropdown colors */
+    --theme-dropdown-bg: 0 0% 100%;
+    --theme-dropdown-text: 155 15% 40%;
+    --theme-dropdown-hover: 5 35% 91%;
+
+    /* Selection colors */
+    --theme-selection-bg: 155 15% 40%;
+    --theme-selection-text: 5 35% 91%;
+    --theme-selection-user-bg: 155 15% 40% / 0.3;
+    --theme-selection-user-text: 0 0% 100%;
+  }
+
+  /* Choco Strawberry Theme */
+  .theme-choco-strawberry {
+    --theme-bg: 0 2% 15%; /* #262727 */
+    --theme-surface: 0 2% 15%;
+    --theme-primary: 20 35% 87%; /* #f0d3c9 */
+    --theme-secondary: 30 5% 20%; /* #343231 */
+    --theme-text: 0 0% 100%; /* #ffffff */
+    --theme-text-muted: 0 0% 80%;
+    --theme-text-on-primary: 30 5% 20%;
+    --theme-text-on-secondary: 0 0% 100%;
+    --theme-border: 30 5% 20%;
+    --theme-border-muted: 30 5% 25%;
+    --theme-hover: 30 5% 25%;
+    --theme-active: 20 35% 87%;
+
+    /* Dropdown colors - improved contrast */
+    --theme-dropdown-bg: 30 5% 25%;
+    --theme-dropdown-text: 0 0% 100%;
+    --theme-dropdown-hover: 30 5% 30%;
+
+    /* Selection colors */
+    --theme-selection-bg: 20 35% 87%;
+    --theme-selection-text: 30 5% 20%;
+    --theme-selection-user-bg: 20 35% 87% / 0.4;
+    --theme-selection-user-text: 0 0% 0%;
+  }
+
+  /* Lavender Theme - Inspired by MonkeyType */
+  .theme-lavender {
+    --theme-bg: 255 20% 70%; /* #ada6c2 - keep the lovely background */
+    --theme-surface: 255 20% 70%;
+    --theme-primary: 240 25% 25%; /* #3a3548 - deep navy for primary elements */
+    --theme-secondary: 240 15% 35%; /* #524c63 - muted purple-gray for secondary */
+    --theme-text: 240 10% 45%; /* #6b6575 - muted text that complements lavender */
+    --theme-text-muted: 240 8% 55%; /* #7a7485 - lighter muted text */
+    --theme-text-on-primary: 255 20% 85%; /* #d4d1dc - light text on dark elements */
+    --theme-text-on-secondary: 255 20% 85%; /* #d4d1dc - consistent light text */
+    --theme-border: 240 15% 35%; /* #524c63 - subtle borders */
+    --theme-border-muted: 240 10% 60%; /* #8a8595 - very subtle borders */
+    --theme-hover: 240 15% 40%; /* #5a5469 - slightly lighter hover state */
+    --theme-active: 240 25% 25%; /* #3a3548 - same as primary for consistency */
+
+    /* Dropdown colors */
+    --theme-dropdown-bg: 240 25% 30%; /* #423d52 - dark dropdown background */
+    --theme-dropdown-text: 255 20% 85%; /* #d4d1dc - light text for contrast */
+    --theme-dropdown-hover: 240 25% 35%; /* #4a4459 - subtle hover */
+
+    /* Selection colors */
+    --theme-selection-bg: 240 25% 25%; /* #3a3548 - dark selection */
+    --theme-selection-text: 255 20% 85%; /* #d4d1dc - light selection text */
+    --theme-selection-user-bg: 240 25% 25% / 0.4; /* semi-transparent dark */
+    --theme-selection-user-text: 0 0% 100%; /* white for maximum contrast */
+  }
+
+  /* Paper Theme */
+  .theme-paper {
+    --theme-bg: 0 0% 93%; /* #eeeeee */
+    --theme-surface: 0 0% 93%;
+    --theme-primary: 0 0% 27%; /* #444444 */
+    --theme-secondary: 0 0% 87%; /* #dddddd */
+    --theme-text: 0 0% 27%; /* #444444 */
+    --theme-text-muted: 0 0% 35%;
+    --theme-text-on-primary: 0 0% 93%; /* #eeeeee */
+    --theme-text-on-secondary: 0 0% 27%; /* #444444 */
+    --theme-border: 0 0% 87%;
+    --theme-border-muted: 0 0% 80%;
+    --theme-hover: 0 0% 85%;
+    --theme-active: 0 0% 27%;
+
+    /* Dropdown colors */
+    --theme-dropdown-bg: 0 0% 100%;
+    --theme-dropdown-text: 0 0% 27%;
+    --theme-dropdown-hover: 0 0% 93%;
+
+    /* Selection colors */
+    --theme-selection-bg: 0 0% 27%;
+    --theme-selection-text: 0 0% 93%;
+    --theme-selection-user-bg: 0 0% 27% / 0.3;
+    --theme-selection-user-text: 0 0% 100%;
+  }
+
+  /* Nord Theme */
+  .theme-nord {
+    --theme-bg: 220 20% 18%; /* #242933 */
+    --theme-surface: 220 20% 18%;
+    --theme-primary: 220 15% 48%; /* #6a7791 */
+    --theme-secondary: 218 27% 87%; /* #d8dee9 */
+    --theme-text: 0 0% 70%; /* #b2b2b2 */
+    --theme-text-muted: 0 0% 65%;
+    --theme-text-on-primary: 218 27% 87%;
+    --theme-text-on-secondary: 220 15% 48%;
+    --theme-border: 218 27% 87%;
+    --theme-border-muted: 218 27% 80%;
+    --theme-hover: 218 27% 80%;
+    --theme-active: 220 15% 48%;
+
+    /* Dropdown colors */
+    --theme-dropdown-bg: 220 20% 25%;
+    --theme-dropdown-text: 0 0% 90%;
+    --theme-dropdown-hover: 220 20% 30%;
+
+    /* Selection colors */
+    --theme-selection-bg: 220 15% 48%;
+    --theme-selection-text: 218 27% 87%;
+    --theme-selection-user-bg: 220 15% 48% / 0.3;
+    --theme-selection-user-text: 0 0% 100%;
+  }
+
+  /* Nord Light Theme */
+  .theme-nord-light {
+    --theme-bg: 218 27% 94%; /* #eceff4 */
+    --theme-surface: 218 27% 94%;
+    --theme-primary: 220 15% 65%; /* #929aaa */
+    --theme-secondary: 220 25% 25%; /* #2e3440 */
+    --theme-text: 220 25% 25%; /* #2e3440 */
+    --theme-text-muted: 220 15% 45%;
+    --theme-text-on-primary: 218 27% 94%;
+    --theme-text-on-secondary: 218 27% 94%;
+    --theme-border: 220 25% 25%;
+    --theme-border-muted: 220 15% 75%;
+    --theme-hover: 220 15% 85%;
+    --theme-active: 220 15% 65%;
+
+    /* Dropdown colors */
+    --theme-dropdown-bg: 0 0% 100%;
+    --theme-dropdown-text: 220 25% 25%;
+    --theme-dropdown-hover: 218 27% 94%;
+
+    /* Selection colors */
+    --theme-selection-bg: 220 15% 65%;
+    --theme-selection-text: 218 27% 94%;
+    --theme-selection-user-bg: 220 15% 65% / 0.3;
+    --theme-selection-user-text: 220 25% 25%;
   }
 }
 
@@ -98,37 +338,37 @@ body {
 
 /* Custom text selection colors to match theme */
 ::selection {
-  background-color: #6b886b;
-  color: #e4e4d4;
+  background-color: hsl(var(--theme-selection-bg));
+  color: hsl(var(--theme-selection-text));
 }
 
 ::-moz-selection {
-  background-color: #6b886b;
-  color: #e4e4d4;
+  background-color: hsl(var(--theme-selection-bg));
+  color: hsl(var(--theme-selection-text));
 }
 
 /* Input field selection colors */
 input::selection,
 textarea::selection {
-  background-color: #6b886b;
-  color: #e4e4d4;
+  background-color: hsl(var(--theme-selection-bg));
+  color: hsl(var(--theme-selection-text));
 }
 
 input::-moz-selection,
 textarea::-moz-selection {
-  background-color: #6b886b;
-  color: #e4e4d4;
+  background-color: hsl(var(--theme-selection-bg));
+  color: hsl(var(--theme-selection-text));
 }
 
 /* User chat bubble selection colors - enhanced visibility */
 .user-message::selection {
-  background-color: rgba(228, 228, 212, 0.7); /* Lighter background for better contrast */
-  color: #6b886b; /* Darker text for visibility */
+  background-color: hsl(var(--theme-selection-user-bg));
+  color: hsl(var(--theme-selection-user-text));
 }
 
 .user-message::-moz-selection {
-  background-color: rgba(228, 228, 212, 0.7);
-  color: #6b886b;
+  background-color: hsl(var(--theme-selection-user-bg));
+  color: hsl(var(--theme-selection-user-text));
 }
 
 /* Hide scrollbar but maintain functionality */
@@ -139,4 +379,61 @@ textarea::-moz-selection {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
+}
+
+/* Settings Modal Animations */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes modalFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdropFadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.modal-enter {
+  animation: modalFadeIn 0.2s ease-out forwards;
+}
+
+.modal-exit {
+  animation: modalFadeOut 0.15s ease-in forwards;
+}
+
+.backdrop-enter {
+  animation: backdropFadeIn 0.2s ease-out forwards;
+}
+
+.backdrop-exit {
+  animation: backdropFadeOut 0.15s ease-in forwards;
 }
