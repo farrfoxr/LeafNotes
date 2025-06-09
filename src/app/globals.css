@@ -48,10 +48,10 @@ body {
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Default Theme - Leaf/Nature Theme - EXACT ORIGINAL COLORS */
+    /* Default Theme - Leaf/Nature Theme */
     --theme-bg: 75 20% 89%; /* #e4e4d4 */
     --theme-surface: 75 20% 89%; /* #e4e4d4 */
-    --theme-primary: 120, 12%, 48%; /* #6b886b suppsoed to be 120, 12%, 48% for all this shade of hex*/ 
+    --theme-primary: 120, 12%, 48%; /* #6b886b */
     --theme-secondary: 75 20% 79%; /* #cbd0bf */
     --theme-text: 120 12% 48%; /* #8a9b69 Darker for better readability */
     --theme-text-muted: 120 12% 45%; /* #8a9b69 Slightly lighter for muted text */
@@ -67,11 +67,9 @@ body {
     --theme-dropdown-text: 75 20% 51%; /* #8a9b69 */
     --theme-dropdown-hover: 75 20% 89%; /* #e4e4d4 */
 
-    /* Selection colors */
-    --theme-selection-bg: 95 15% 47%; /* #6b886b */
-    --theme-selection-text: 75 20% 89%; /* #e4e4d4 */
-    --theme-selection-user-bg: 95 15% 47% / 0.3; /* #6b886b with opacity */
-    --theme-selection-user-text: 0 0% 100%; /* white */
+    /* Unified selection color - Deep forest green with cream text */
+    --theme-selection: 120 25% 35%; /* Deep forest green */
+    --theme-selection-text: 75 20% 92%; /* Warm cream */
   }
 
   .dark {
@@ -127,11 +125,9 @@ body {
     --theme-dropdown-text: 75 20% 70%;
     --theme-dropdown-hover: 240 10% 20%;
 
-    /* Selection colors */
-    --theme-selection-bg: 95 15% 47%;
-    --theme-selection-text: 75 20% 88%;
-    --theme-selection-user-bg: 95 15% 47% / 0.3;
-    --theme-selection-user-text: 0 0% 100%;
+    /* Unified selection color - Consistent green with light text */
+    --theme-selection: 95 20% 45%; /* Slightly deeper green */
+    --theme-selection-text: 75 20% 90%; /* Light cream */
   }
 
   /* Ocean Theme */
@@ -154,24 +150,22 @@ body {
     --theme-dropdown-text: 200 30% 40%;
     --theme-dropdown-hover: 200 20% 88%;
 
-    /* Selection colors */
-    --theme-selection-bg: 200 50% 45%;
-    --theme-selection-text: 200 20% 88%;
-    --theme-selection-user-bg: 200 50% 45% / 0.3;
-    --theme-selection-user-text: 0 0% 100%;
+    /* Unified selection color - Rich teal blue with light text */
+    --theme-selection: 200 55% 38%; /* Deep ocean teal */
+    --theme-selection-text: 200 25% 92%; /* Light ocean mist */
   }
 
   /* Cherry Witch Theme */
   .theme-cherry-witch {
-    --theme-bg: 5 35% 91%; /* #f3dbda */
+    --theme-bg: 2, 51%, 90%; /* #f3dbda */
     --theme-surface: 5 35% 91%;
-    --theme-primary: 155 15% 40%; /* #56786a */
-    --theme-secondary: 15 35% 75%; /* #ddb4a7 */
-    --theme-text: 155 15% 40%; /* #56786a */
-    --theme-text-muted: 155 15% 40%;
+    --theme-primary: 155, 17%, 40%; /* #56786a */
+    --theme-secondary: 15, 46%, 83%; /* #ddb4a7 */
+    --theme-text: 155 17% 40%; /* #56786a */
+    --theme-text-muted: 155 17% 40%;
     --theme-text-on-primary: 5 35% 91%;
-    --theme-text-on-secondary: 155 15% 40%;
-    --theme-border: 15 35% 75%;
+    --theme-text-on-secondary: 155 17% 40%;
+    --theme-border: 15 35% 80%;
     --theme-border-muted: 15 35% 75%;
     --theme-hover: 15 35% 75%;
     --theme-active: 155 15% 40%;
@@ -181,11 +175,9 @@ body {
     --theme-dropdown-text: 155 15% 40%;
     --theme-dropdown-hover: 5 35% 91%;
 
-    /* Selection colors */
-    --theme-selection-bg: 155 15% 40%;
-    --theme-selection-text: 5 35% 91%;
-    --theme-selection-user-bg: 155 15% 40% / 0.3;
-    --theme-selection-user-text: 0 0% 100%;
+    /* Unified selection color - Warm sage green with light text */
+    --theme-selection: 155 22% 35%; /* Deeper sage green */
+    --theme-selection-text: 15 50% 92%; /* Warm peachy cream */
   }
 
   /* Choco Strawberry Theme */
@@ -208,11 +200,9 @@ body {
     --theme-dropdown-text: 0 0% 100%;
     --theme-dropdown-hover: 30 5% 30%;
 
-    /* Selection colors */
-    --theme-selection-bg: 20 35% 87%;
-    --theme-selection-text: 30 5% 20%;
-    --theme-selection-user-bg: 20 35% 87% / 0.4;
-    --theme-selection-user-text: 0 0% 0%;
+    /* Unified selection color - Warm cream with dark chocolate text */
+    --theme-selection: 20 40% 82%; /* Rich cream */
+    --theme-selection-text: 30 8% 18%; /* Dark chocolate */
   }
 
   /* Lavender Theme - Inspired by MonkeyType */
@@ -235,11 +225,9 @@ body {
     --theme-dropdown-text: 255 20% 85%; /* #d4d1dc - light text for contrast */
     --theme-dropdown-hover: 240 25% 35%; /* #4a4459 - subtle hover */
 
-    /* Selection colors */
-    --theme-selection-bg: 240 25% 25%; /* #3a3548 - dark selection */
-    --theme-selection-text: 255 20% 85%; /* #d4d1dc - light selection text */
-    --theme-selection-user-bg: 240 25% 25% / 0.4; /* semi-transparent dark */
-    --theme-selection-user-text: 0 0% 100%; /* white for maximum contrast */
+    /* Unified selection color - Deep purple-navy with dreamy light text */
+    --theme-selection: 240 30% 22%; /* Deep lavender navy */
+    --theme-selection-text: 255 25% 88%; /* Dreamy lavender cream */
   }
 
   /* Paper Theme */
@@ -262,11 +250,9 @@ body {
     --theme-dropdown-text: 0 0% 27%;
     --theme-dropdown-hover: 0 0% 93%;
 
-    /* Selection colors */
-    --theme-selection-bg: 0 0% 27%;
-    --theme-selection-text: 0 0% 93%;
-    --theme-selection-user-bg: 0 0% 27% / 0.3;
-    --theme-selection-user-text: 0 0% 100%;
+    /* Unified selection color - Classic dark gray with clean light text */
+    --theme-selection: 0 0% 25%; /* Deep charcoal */
+    --theme-selection-text: 0 0% 95%; /* Clean paper white */
   }
 
   /* Nord Theme */
@@ -289,11 +275,9 @@ body {
     --theme-dropdown-text: 0 0% 90%;
     --theme-dropdown-hover: 220 20% 30%;
 
-    /* Selection colors */
-    --theme-selection-bg: 220 15% 48%;
-    --theme-selection-text: 218 27% 87%;
-    --theme-selection-user-bg: 220 15% 48% / 0.3;
-    --theme-selection-user-text: 0 0% 100%;
+    /* Unified selection color - Arctic blue with light text */
+    --theme-selection: 220 20% 45%; /* Arctic blue */
+    --theme-selection-text: 218 30% 90%; /* Nordic snow */
   }
 
   /* Nord Light Theme */
@@ -316,11 +300,9 @@ body {
     --theme-dropdown-text: 220 25% 25%;
     --theme-dropdown-hover: 218 27% 94%;
 
-    /* Selection colors */
-    --theme-selection-bg: 220 15% 65%;
-    --theme-selection-text: 218 27% 94%;
-    --theme-selection-user-bg: 220 15% 65% / 0.3;
-    --theme-selection-user-text: 220 25% 25%;
+    /* Unified selection color - Muted blue-gray with elegant light text */
+    --theme-selection: 220 18% 58%; /* Elegant blue-gray */
+    --theme-selection-text: 218 30% 96%; /* Pure nordic white */
   }
 }
 
@@ -336,39 +318,39 @@ body {
   }
 }
 
-/* Custom text selection colors to match theme */
+/* Unified text selection colors for all content */
 ::selection {
-  background-color: hsl(var(--theme-selection-bg));
+  background-color: hsl(var(--theme-selection));
   color: hsl(var(--theme-selection-text));
 }
 
 ::-moz-selection {
-  background-color: hsl(var(--theme-selection-bg));
+  background-color: hsl(var(--theme-selection));
   color: hsl(var(--theme-selection-text));
 }
 
 /* Input field selection colors */
 input::selection,
 textarea::selection {
-  background-color: hsl(var(--theme-selection-bg));
+  background-color: hsl(var(--theme-selection));
   color: hsl(var(--theme-selection-text));
 }
 
 input::-moz-selection,
 textarea::-moz-selection {
-  background-color: hsl(var(--theme-selection-bg));
+  background-color: hsl(var(--theme-selection));
   color: hsl(var(--theme-selection-text));
 }
 
-/* User chat bubble selection colors - enhanced visibility */
+/* User chat bubble selection colors - now unified */
 .user-message::selection {
-  background-color: hsl(var(--theme-selection-user-bg));
-  color: hsl(var(--theme-selection-user-text));
+  background-color: hsl(var(--theme-selection));
+  color: hsl(var(--theme-selection-text));
 }
 
 .user-message::-moz-selection {
-  background-color: hsl(var(--theme-selection-user-bg));
-  color: hsl(var(--theme-selection-user-text));
+  background-color: hsl(var(--theme-selection));
+  color: hsl(var(--theme-selection-text));
 }
 
 /* Hide scrollbar but maintain functionality */

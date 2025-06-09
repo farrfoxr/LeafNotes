@@ -343,10 +343,17 @@ export function ChatSidebar({
             </button>
 
             {/* New Chat Button */}
+            {/* New Chat Button */}
             <button
               onClick={() => handleNewChatInFolder()}
               className={cn(
-                "flex items-center bg-theme-primary hover:bg-theme-primary/90 text-theme-text-on-primary rounded-lg font-medium shadow-sm h-10",
+                "flex items-center bg-theme-primary text-theme-text-on-primary rounded-lg font-medium shadow-sm h-10 transition-colors",
+                // Option 1: Shadow effect (recommended)
+                // "hover:bg-theme-primary hover:shadow-md",
+
+                // Option 3: Brightness effect (if your theme supports it)
+                "hover:brightness-110",
+
                 isOpen ? "w-full px-3 gap-3" : "w-10 justify-center",
               )}
             >

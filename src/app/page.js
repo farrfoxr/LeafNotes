@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { ArrowUp, Paperclip, ChevronDown } from "lucide-react"
 import { ChatSidebar } from "@/components/chat-sidebar"
 import { SettingsModal } from "@/components/settings-modal"
+import { MessageRenderer } from "@/components/message-renderer"
 
 function cn(...inputs) {
   // Simple className merger for this project
@@ -38,6 +39,103 @@ export default function ChatInterface() {
   const generateChatTitle = (userInput) => {
     const trimmedInput = userInput.trim()
     return trimmedInput.length > 50 ? trimmedInput.slice(0, 50) + "..." : trimmedInput
+  }
+
+  // Mock function to simulate formatted AI responses
+  const generateFormattedResponse = (userInput, model) => {
+    const responses = [
+      `# Understanding "${userInput}"
+
+This is a **formatted response** from ${model}. Here's what I can help you with:
+
+## Key Points:
+- *Detailed analysis* of your question
+- **Comprehensive answers** with proper formatting
+- Code examples when needed
+- \`inline code\` for technical terms
+
+### Features:
+1. **Bold text** for emphasis
+2. *Italic text* for subtle emphasis
+3. \`code snippets\` for technical content
+4. Lists for better organization
+
+---
+
+> This is a blockquote example to show how quoted text appears in responses.
+
+\`\`\`javascript
+// Here's a code block example
+function example() {
+  return "This is how code appears";
+}
+\`\`\`
+
+Would you like me to elaborate on any of these points?`,
+
+      `**Analysis Complete** ✓
+
+Your query about "${userInput}" has been processed by ${model}. Here's my response:
+
+## Summary
+- Successfully understood your request
+- Generated *contextual response*
+- Applied **proper formatting**
+
+### Technical Details:
+\`\`\`
+Response Format: Markdown
+Processing Time: ~2s
+Model: ${model}
+\`\`\`
+
+> **Note**: This is a simulated response demonstrating formatted text rendering.
+
+**Next Steps:**
+1. Review the information provided
+2. Ask follow-up questions if needed
+3. Request specific examples or clarifications
+
+---
+
+*Is there anything specific you'd like me to focus on?*`,
+
+      `# ${model} Response
+
+Hello! I understand you're asking about **"${userInput}"**.
+
+## Here's how I can help:
+
+### Formatting Features:
+- **Bold text** works perfectly
+- *Italics* are rendered correctly  
+- \`inline code\` displays properly
+- Lists maintain proper structure
+
+### Code Examples:
+\`\`\`python
+def process_response(input_text):
+    """Process user input and generate formatted response"""
+    return {
+        'status': 'success',
+        'formatted': True,
+        'model': '${model}'
+    }
+\`\`\`
+
+---
+
+> **Pro Tip**: This formatting system supports standard Markdown syntax including headers, lists, code blocks, and more!
+
+**Available Actions:**
+1. Copy this response using the copy button
+2. Retry to get a different response  
+3. Continue the conversation
+
+*Let me know if you need any clarification!*`
+    ]
+
+    return responses[Math.floor(Math.random() * responses.length)]
   }
 
   const handleSubmit = async (e, targetFolderId = null) => {
@@ -85,16 +183,17 @@ export default function ChatInterface() {
       )
     }
 
+    const userInputValue = input.trim()
     setInput("")
     setIsLoading(true)
 
-    // Simulate AI response
+    // Simulate AI response with formatted content
     setTimeout(
       () => {
         const aiMessage = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: `I understand you're asking about "${userMessage.content}". This is a simulated response from ${selectedModel}. In a real implementation, this would connect to your chosen AI model's API.`,
+          content: generateFormattedResponse(userInputValue, selectedModel),
           timestamp: new Date(),
         }
         setMessages((prev) => [...prev, aiMessage])
@@ -109,6 +208,47 @@ export default function ChatInterface() {
       },
       1000 + Math.random() * 2000,
     )
+  }
+
+  const handleRetry = (messageId) => {
+    // Find the message to retry
+    const messageIndex = messages.findIndex(msg => msg.id === messageId)
+    if (messageIndex === -1) return
+
+    const messageToRetry = messages[messageIndex]
+    if (messageToRetry.role !== 'assistant') return
+
+    // Find the user message that triggered this response
+    const userMessage = messageIndex > 0 ? messages[messageIndex - 1] : null
+    if (!userMessage || userMessage.role !== 'user') return
+
+    // Remove the AI message and regenerate
+    const newMessages = messages.slice(0, messageIndex)
+    setMessages(newMessages)
+    setIsLoading(true)
+
+    // Generate new response
+    setTimeout(() => {
+      const newAiMessage = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: generateFormattedResponse(userMessage.content, selectedModel),
+        timestamp: new Date(),
+      }
+      
+      setMessages(prev => [...prev, newAiMessage])
+      
+      // Update chat history
+      setChats(prev =>
+        prev.map(chat =>
+          chat.id === currentChatId
+            ? { ...chat, messages: [...newMessages, newAiMessage] }
+            : chat
+        )
+      )
+      
+      setIsLoading(false)
+    }, 1000 + Math.random() * 1500)
   }
 
   const handleKeyDown = (e) => {
@@ -229,40 +369,74 @@ export default function ChatInterface() {
             <div className="flex-1 flex flex-col min-h-0">
               <div className="flex-1 overflow-y-auto">
                 <div className="max-w-4xl mx-auto px-6 py-6">
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        <div
-                          className={`max-w-[80%] rounded-2xl px-4 py-3 break-words ${
-                            message.role === "user"
-                              ? "bg-theme-primary text-theme-text-on-primary user-message"
-                              : "bg-theme-secondary text-theme-text-on-secondary"
-                          }`}
-                        >
-                          <p className="text-sm leading-relaxed break-words">{message.content}</p>
-                          <p className="text-xs opacity-70 mt-2">
-                            {message.timestamp.toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </p>
-                        </div>
+                      <div key={message.id} className="w-full">
+                        {message.role === "user" ? (
+                          /* User Message - Keep bubble style */
+                          <div className="flex justify-end">
+                            <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-theme-primary text-theme-text-on-primary user-message break-words">
+                              <p className="text-sm leading-relaxed break-words">{message.content}</p>
+                              <p className="text-xs opacity-70 mt-2">
+                                {message.timestamp.toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          /* Assistant Message - With formatted content */
+                          <div className="flex items-start gap-4">
+                            {/* AI Avatar */}
+                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-theme-secondary flex items-center justify-center">
+                              <span className="text-xs font-medium text-theme-text-on-secondary">AI</span>
+                            </div>
+                            
+                            {/* Message Content */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="text-sm font-medium text-theme-text">{selectedModel}</span>
+                                <span className="text-xs text-theme-text opacity-60">
+                                  {message.timestamp.toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
+                              </div>
+                              
+                              {/* Formatted Message Content */}
+                              <div className="text-sm leading-relaxed">
+                                <MessageRenderer 
+                                  content={message.content} 
+                                  onRetry={handleRetry}
+                                  messageId={message.id}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
+                    
+                    {/* Loading Animation */}
                     {isLoading && (
-                      <div className="flex justify-start">
-                        <div className="bg-theme-secondary text-theme-text-on-secondary rounded-2xl px-4 py-3">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-theme-secondary flex items-center justify-center">
+                          <span className="text-xs font-medium text-theme-text-on-secondary">AI</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm font-medium text-theme-text">{selectedModel}</span>
+                          </div>
                           <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-theme-text-on-secondary rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-theme-text rounded-full animate-bounce opacity-60"></div>
                             <div
-                              className="w-2 h-2 bg-theme-text-on-secondary rounded-full animate-bounce"
+                              className="w-2 h-2 bg-theme-text rounded-full animate-bounce opacity-60"
                               style={{ animationDelay: "0.1s" }}
                             ></div>
                             <div
-                              className="w-2 h-2 bg-theme-text-on-secondary rounded-full animate-bounce"
+                              className="w-2 h-2 bg-theme-text rounded-full animate-bounce opacity-60"
                               style={{ animationDelay: "0.2s" }}
                             ></div>
                           </div>
@@ -330,6 +504,7 @@ export default function ChatInterface() {
               {/* Header */}
               <div className="text-center mb-16">
                 <h1 className="text-5xl md:text-6xl font-light text-theme-text tracking-wide">Leaf Notes</h1>
+                <p className="text-theme-text opacity-60 mt-4 text-lg">Your AI-powered conversation companion</p>
               </div>
 
               {/* Input Section */}
