@@ -51,7 +51,7 @@ body {
     /* Default Theme - Leaf/Nature Theme */
     --theme-bg: 75 20% 89%; /* #e4e4d4 */
     --theme-surface: 75 20% 89%; /* #e4e4d4 */
-    --theme-primary: 120, 12%, 48%; /* #6b886b */
+    --theme-primary: 120 12% 48%; /* #6b886b */
     --theme-secondary: 75 20% 79%; /* #cbd0bf */
     --theme-text: 120 12% 48%; /* #8a9b69 Darker for better readability */
     --theme-text-muted: 120 12% 45%; /* #8a9b69 Slightly lighter for muted text */
@@ -60,7 +60,7 @@ body {
     --theme-border: 75 20% 79%; /* #cbd0bf */
     --theme-border-muted: 75 20% 79%; /* #cbd0bf */
     --theme-hover: 75 20% 79%; /* #cbd0bf */
-    --theme-active: 120, 12%, 48%; /* #6b886b */
+    --theme-active: 120 12% 48%; /* #6b886b */
 
     /* Dropdown colors */
     --theme-dropdown-bg: 0 0% 100%; /* white */
@@ -69,7 +69,7 @@ body {
 
     /* Unified selection color - Deep forest green with cream text */
     --theme-selection: 120 25% 35%; /* Deep forest green */
-    --theme-selection-text: 75 20% 92%; /* Warm cream */
+    --theme-selection-text: 60 25% 92%; /* Warm cream */
   }
 
   .dark {
@@ -157,23 +157,23 @@ body {
 
   /* Cherry Witch Theme */
   .theme-cherry-witch {
-    --theme-bg: 2, 51%, 90%; /* #f3dbda */
-    --theme-surface: 5 35% 91%;
-    --theme-primary: 155, 17%, 40%; /* #56786a */
-    --theme-secondary: 15, 46%, 83%; /* #ddb4a7 */
+    --theme-bg: 2 51% 90%; /* #f3dbda */
+    --theme-surface: 2 51% 90%;
+    --theme-primary: 155 17% 40%; /* #56786a */
+    --theme-secondary: 15 36% 79%; /* #ddb4a7 */
     --theme-text: 155 17% 40%; /* #56786a */
-    --theme-text-muted: 155 17% 40%;
-    --theme-text-on-primary: 5 35% 91%;
-    --theme-text-on-secondary: 155 17% 40%;
-    --theme-border: 15 35% 80%;
-    --theme-border-muted: 15 35% 75%;
-    --theme-hover: 15 35% 75%;
-    --theme-active: 155 15% 40%;
+    --theme-text-muted: 15 46% 83%; /* #ddb4a7 */
+    --theme-text-on-primary: 2 51% 90%; /* #f3dbda */
+    --theme-text-on-secondary: 155 17% 40%; /* #56786a */
+    --theme-border: 15 46% 83%; /* #ddb4a7 */
+    --theme-border-muted: 15 46% 83%; /* #ddb4a7 */
+    --theme-hover: 15 46% 83%; /* #ddb4a7 */
+    --theme-active: 155 17% 40%; /* #56786a */
 
     /* Dropdown colors */
     --theme-dropdown-bg: 0 0% 100%;
-    --theme-dropdown-text: 155 15% 40%;
-    --theme-dropdown-hover: 5 35% 91%;
+    --theme-dropdown-text: 155 17% 40%;
+    --theme-dropdown-hover: 2 51% 90%;
 
     /* Unified selection color - Warm sage green with light text */
     --theme-selection: 155 22% 35%; /* Deeper sage green */
@@ -182,52 +182,52 @@ body {
 
   /* Choco Strawberry Theme */
   .theme-choco-strawberry {
-    --theme-bg: 0 2% 15%; /* #262727 */
-    --theme-surface: 0 2% 15%;
-    --theme-primary: 20 35% 87%; /* #f0d3c9 */
-    --theme-secondary: 30 5% 20%; /* #343231 */
+    --theme-bg: 180 1% 15%; /* #262727 */
+    --theme-surface: 180 1% 15%;
+    --theme-primary: 15 57% 86%; /* #f0d3c9 */
+    --theme-secondary: 8 8% 37%; /* #5a5856 */
     --theme-text: 0 0% 100%; /* #ffffff */
-    --theme-text-muted: 0 0% 80%;
-    --theme-text-on-primary: 30 5% 20%;
-    --theme-text-on-secondary: 0 0% 100%;
-    --theme-border: 30 5% 20%;
-    --theme-border-muted: 30 5% 25%;
-    --theme-hover: 30 5% 25%;
-    --theme-active: 20 35% 87%;
-
-    /* Dropdown colors - improved contrast */
-    --theme-dropdown-bg: 30 5% 25%;
-    --theme-dropdown-text: 0 0% 100%;
-    --theme-dropdown-hover: 30 5% 30%;
-
-    /* Unified selection color - Warm cream with dark chocolate text */
-    --theme-selection: 20 40% 82%; /* Rich cream */
-    --theme-selection-text: 30 8% 18%; /* Dark chocolate */
-  }
-
-  /* Lavender Theme - Inspired by MonkeyType */
-  .theme-lavender {
-    --theme-bg: 255 20% 70%; /* #ada6c2 - keep the lovely background */
-    --theme-surface: 255 20% 70%;
-    --theme-primary: 240 25% 25%; /* #3a3548 - deep navy for primary elements */
-    --theme-secondary: 240 15% 35%; /* #524c63 - muted purple-gray for secondary */
-    --theme-text: 240 10% 45%; /* #6b6575 - muted text that complements lavender */
-    --theme-text-muted: 240 8% 55%; /* #7a7485 - lighter muted text */
-    --theme-text-on-primary: 255 20% 85%; /* #d4d1dc - light text on dark elements */
-    --theme-text-on-secondary: 255 20% 85%; /* #d4d1dc - consistent light text */
-    --theme-border: 240 15% 35%; /* #524c63 - subtle borders */
-    --theme-border-muted: 240 10% 60%; /* #8a8595 - very subtle borders */
-    --theme-hover: 240 15% 40%; /* #5a5469 - slightly lighter hover state */
-    --theme-active: 240 25% 25%; /* #3a3548 - same as primary for consistency */
+    --theme-text-muted: 8 8% 37%; /* #5a5856 */
+    --theme-text-on-primary: 8 8% 37%; /* #5a5856 */
+    --theme-text-on-secondary: 0 0% 100%; /* #ffffff */
+    --theme-border: 20 3% 20%; /* #343231 */
+    --theme-border-muted: 20 3% 20%; /* #343231 */
+    --theme-hover: 8 8% 37%; /* #5a5856 */
+    --theme-active: 15 57% 86%; /* #f0d3c9 */
 
     /* Dropdown colors */
-    --theme-dropdown-bg: 240 25% 30%; /* #423d52 - dark dropdown background */
-    --theme-dropdown-text: 255 20% 85%; /* #d4d1dc - light text for contrast */
-    --theme-dropdown-hover: 240 25% 35%; /* #4a4459 - subtle hover */
+    --theme-dropdown-bg: 8 8% 37%; /* #5a5856 */
+    --theme-dropdown-text: 0 0% 100%; /* #ffffff */
+    --theme-dropdown-hover: 20 3% 20%; /* #343231 */
 
-    /* Unified selection color - Deep purple-navy with dreamy light text */
-    --theme-selection: 240 30% 22%; /* Deep lavender navy */
-    --theme-selection-text: 255 25% 88%; /* Dreamy lavender cream */
+    /* Unified selection color - Warm cream with dark chocolate text */
+    --theme-selection: 15 60% 82%; /* Rich cream */
+    --theme-selection-text: 8 10% 18%; /* Dark chocolate */
+  }
+
+  /* Rose Pine Dawn Theme - "Golden Hour Elegance" */
+  .theme-rose-pine-dawn {
+    --theme-bg: 35 25% 93%; /* #f7f3f0 - warm dawn light */
+    --theme-surface: 35 25% 93%;
+    --theme-primary: 340 30% 55%; /* #b5818a - muted rose */
+    --theme-secondary: 30 20% 85%; /* #e8ddd6 - soft warm beige */
+    --theme-text: 25 15% 35%; /* #6b5d56 - warm earth brown */
+    --theme-text-muted: 30 15% 60%; /* #a89a91 - muted warm gray */
+    --theme-text-on-primary: 35 25% 93%; /* #f7f3f0 - warm light */
+    --theme-text-on-secondary: 25 15% 35%; /* #6b5d56 - warm earth */
+    --theme-border: 30 20% 85%; /* #e8ddd6 - soft beige borders */
+    --theme-border-muted: 30 15% 88%; /* #ede5df - subtle borders */
+    --theme-hover: 30 15% 88%; /* #ede5df - gentle hover */
+    --theme-active: 340 30% 55%; /* #b5818a - muted rose */
+
+    /* Dropdown colors */
+    --theme-dropdown-bg: 340 30% 55%; /* #b5818a - muted rose */
+    --theme-dropdown-text: 35 25% 93%; /* #f7f3f0 - warm light */
+    --theme-dropdown-hover: 340 30% 60%; /* #c18e96 - lighter rose */
+
+    /* Unified selection color - Deep rose with warm cream */
+    --theme-selection: 340 35% 45%; /* Deep elegant rose */
+    --theme-selection-text: 35 30% 95%; /* Warm dawn cream */
   }
 
   /* Paper Theme */
@@ -237,13 +237,13 @@ body {
     --theme-primary: 0 0% 27%; /* #444444 */
     --theme-secondary: 0 0% 87%; /* #dddddd */
     --theme-text: 0 0% 27%; /* #444444 */
-    --theme-text-muted: 0 0% 35%;
+    --theme-text-muted: 0 0% 70%; /* #b3b3b3 */
     --theme-text-on-primary: 0 0% 93%; /* #eeeeee */
     --theme-text-on-secondary: 0 0% 27%; /* #444444 */
-    --theme-border: 0 0% 87%;
-    --theme-border-muted: 0 0% 80%;
-    --theme-hover: 0 0% 85%;
-    --theme-active: 0 0% 27%;
+    --theme-border: 0 0% 87%; /* #dddddd */
+    --theme-border-muted: 0 0% 87%; /* #dddddd */
+    --theme-hover: 0 0% 87%; /* #dddddd */
+    --theme-active: 0 0% 27%; /* #444444 */
 
     /* Dropdown colors */
     --theme-dropdown-bg: 0 0% 100%;
@@ -257,52 +257,52 @@ body {
 
   /* Nord Theme */
   .theme-nord {
-    --theme-bg: 220 20% 18%; /* #242933 */
-    --theme-surface: 220 20% 18%;
-    --theme-primary: 220 15% 48%; /* #6a7791 */
-    --theme-secondary: 218 27% 87%; /* #d8dee9 */
-    --theme-text: 0 0% 70%; /* #b2b2b2 */
-    --theme-text-muted: 0 0% 65%;
-    --theme-text-on-primary: 218 27% 87%;
-    --theme-text-on-secondary: 220 15% 48%;
-    --theme-border: 218 27% 87%;
-    --theme-border-muted: 218 27% 80%;
-    --theme-hover: 218 27% 80%;
-    --theme-active: 220 15% 48%;
+    --theme-bg: 220 17% 17%; /* #242933 */
+    --theme-surface: 220 17% 17%;
+    --theme-primary: 220 16% 22%; /* #2e3440 */
+    --theme-secondary: 220 16% 28%; /* #3b4252 - much darker for code backgrounds */
+    --theme-text: 219 28% 88%; /* #d8dee9 */
+    --theme-text-muted: 220 12% 62%; /* #8a8fa0 */
+    --theme-text-on-primary: 219 28% 88%; /* #d8dee9 */
+    --theme-text-on-secondary: 219 28% 88%; /* #d8dee9 - keep light text */
+    --theme-border: 220 16% 22%; /* #2e3440 */
+    --theme-border-muted: 220 16% 22%; /* #2e3440 */
+    --theme-hover: 220 12% 62%; /* #8a8fa0 */
+    --theme-active: 193 43% 67%; /* #88c0d0 */
 
     /* Dropdown colors */
-    --theme-dropdown-bg: 220 20% 25%;
-    --theme-dropdown-text: 0 0% 90%;
-    --theme-dropdown-hover: 220 20% 30%;
+    --theme-dropdown-bg: 220 16% 28%; /* #3b4252 - matches new secondary */
+    --theme-dropdown-text: 219 28% 88%; /* #d8dee9 */
+    --theme-dropdown-hover: 220 16% 32%; /* slightly lighter hover */
 
     /* Unified selection color - Arctic blue with light text */
-    --theme-selection: 220 20% 45%; /* Arctic blue */
-    --theme-selection-text: 218 30% 90%; /* Nordic snow */
+    --theme-selection: 193 43% 67%; /* Arctic blue */
+    --theme-selection-text: 219 30% 90%; /* Nordic snow */
   }
 
-  /* Nord Light Theme */
+  /* Nord Light Theme - "Arctic Elegance" */
   .theme-nord-light {
-    --theme-bg: 218 27% 94%; /* #eceff4 */
-    --theme-surface: 218 27% 94%;
-    --theme-primary: 220 15% 65%; /* #929aaa */
-    --theme-secondary: 220 25% 25%; /* #2e3440 */
-    --theme-text: 220 25% 25%; /* #2e3440 */
-    --theme-text-muted: 220 15% 45%;
-    --theme-text-on-primary: 218 27% 94%;
-    --theme-text-on-secondary: 218 27% 94%;
-    --theme-border: 220 25% 25%;
-    --theme-border-muted: 220 15% 75%;
-    --theme-hover: 220 15% 85%;
-    --theme-active: 220 15% 65%;
+    --theme-bg: 210 25% 96%; /* #f4f6f8 - sophisticated warm white-blue */
+    --theme-surface: 210 25% 96%;
+    --theme-primary: 215 25% 45%; /* #5d7a94 - elegant slate blue */
+    --theme-secondary: 210 20% 85%; /* #d1d8de - soft blue-gray */
+    --theme-text: 215 30% 35%; /* #4a6075 - rich blue-gray */
+    --theme-text-muted: 210 15% 60%; /* #8f9ba5 - muted blue */
+    --theme-text-on-primary: 210 25% 96%; /* #f4f6f8 - clean white-blue */
+    --theme-text-on-secondary: 215 30% 35%; /* #4a6075 - rich contrast */
+    --theme-border: 210 20% 85%; /* #d1d8de - soft borders */
+    --theme-border-muted: 210 15% 88%; /* #dde2e6 - subtle borders */
+    --theme-hover: 210 15% 88%; /* #dde2e6 - gentle hover */
+    --theme-active: 215 25% 45%; /* #5d7a94 - slate blue */
 
     /* Dropdown colors */
-    --theme-dropdown-bg: 0 0% 100%;
-    --theme-dropdown-text: 220 25% 25%;
-    --theme-dropdown-hover: 218 27% 94%;
+    --theme-dropdown-bg: 215 25% 45%; /* #5d7a94 - elegant slate */
+    --theme-dropdown-text: 210 25% 96%; /* #f4f6f8 - clean white-blue */
+    --theme-dropdown-hover: 215 25% 50%; /* #6682a0 - slightly lighter */
 
-    /* Unified selection color - Muted blue-gray with elegant light text */
-    --theme-selection: 220 18% 58%; /* Elegant blue-gray */
-    --theme-selection-text: 218 30% 96%; /* Pure nordic white */
+    /* Unified selection color - Sophisticated arctic blue */
+    --theme-selection: 215 30% 42%; /* Sophisticated arctic blue */
+    --theme-selection-text: 210 30% 95%; /* Premium arctic white */
   }
 }
 

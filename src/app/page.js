@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { ArrowUp, Paperclip, ChevronDown } from "lucide-react"
+import { ArrowUp, Paperclip, ChevronDown, Edit3, Check, X, Undo } from "lucide-react"
 import { ChatSidebar } from "@/components/chat-sidebar"
 import { SettingsModal } from "@/components/settings-modal"
 import { MessageRenderer } from "@/components/message-renderer"
@@ -22,10 +22,30 @@ export default function ChatInterface() {
   const [chats, setChats] = useState([])
   const [folders, setFolders] = useState([])
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [editingMessageId, setEditingMessageId] = useState(null)
+  const [editingText, setEditingText] = useState("")
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
+  const editTextareaRef = useRef(null)
+
+  // Add refs to track pending operations and current chat
+  const pendingTimeoutsRef = useRef(new Set())
+  const currentChatIdRef = useRef(currentChatId)
 
   const models = ["GPT-4", "GPT-3.5", "Claude-3", "Gemini Pro"]
+
+  // Update the ref whenever currentChatId changes
+  useEffect(() => {
+    currentChatIdRef.current = currentChatId
+  }, [currentChatId])
+
+  // Cleanup function to clear pending timeouts
+  const clearPendingTimeouts = () => {
+    pendingTimeoutsRef.current.forEach((timeoutId) => {
+      clearTimeout(timeoutId)
+    })
+    pendingTimeoutsRef.current.clear()
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -132,7 +152,7 @@ def process_response(input_text):
 2. Retry to get a different response  
 3. Continue the conversation
 
-*Let me know if you need any clarification!*`
+*Let me know if you need any clarification!*`,
     ]
 
     return responses[Math.floor(Math.random() * responses.length)]
@@ -147,9 +167,13 @@ def process_response(input_text):
       role: "user",
       content: input.trim(),
       timestamp: new Date(),
+      editHistory: [input.trim()], // Initialize edit history
     }
 
     const chatTitle = generateChatTitle(input.trim())
+    const userInputValue = input.trim()
+    setInput("")
+    setIsLoading(true)
 
     // If this is the first message and no current chat, create a new chat
     if (!currentChatId) {
@@ -164,13 +188,15 @@ def process_response(input_text):
       setChats((prev) => [newChat, ...prev])
       setCurrentChatId(newChatId)
       setMessages([userMessage])
+
+      // Update the ref immediately
+      currentChatIdRef.current = newChatId
     } else {
-      // Add to existing chat and update title if it's still "New Chat"
+      // Add to existing chat
       setMessages((prev) => [...prev, userMessage])
       setChats((prev) =>
         prev.map((chat) => {
           if (chat.id === currentChatId) {
-            // Update title if it's still "New Chat" or if this is the first user message
             const shouldUpdateTitle = chat.title === "New Chat" || (chat.messages && chat.messages.length === 0)
             return {
               ...chat,
@@ -183,78 +209,252 @@ def process_response(input_text):
       )
     }
 
-    const userInputValue = input.trim()
-    setInput("")
-    setIsLoading(true)
-
-    // Simulate AI response with formatted content
-    setTimeout(
+    // Simulate AI response with proper cleanup and stale closure protection
+    const timeoutId = setTimeout(
       () => {
+        // Remove this timeout from pending set
+        pendingTimeoutsRef.current.delete(timeoutId)
+
+        // Check if we're still on the same chat (prevent stale closure issues)
+        const activeChatId = currentChatIdRef.current
+        if (!activeChatId) {
+          setIsLoading(false)
+          return
+        }
+
         const aiMessage = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
           content: generateFormattedResponse(userInputValue, selectedModel),
           timestamp: new Date(),
         }
-        setMessages((prev) => [...prev, aiMessage])
-        setChats((prev) =>
-          prev.map((chat) =>
-            chat.id === currentChatId
-              ? { ...chat, messages: [...(chat.messages || []), userMessage, aiMessage] }
-              : chat,
-          ),
-        )
+
+        // Only update if we're still on the same chat
+        if (activeChatId === currentChatIdRef.current) {
+          setMessages((prev) => [...prev, aiMessage])
+          setChats((prev) =>
+            prev.map((chat) =>
+              chat.id === activeChatId
+                ? { ...chat, messages: [...(chat.messages || []), aiMessage] } // Only add AI message, user message already added
+                : chat,
+            ),
+          )
+        }
         setIsLoading(false)
       },
       1000 + Math.random() * 2000,
     )
+
+    // Track the timeout
+    pendingTimeoutsRef.current.add(timeoutId)
   }
 
   const handleRetry = (messageId) => {
     // Find the message to retry
-    const messageIndex = messages.findIndex(msg => msg.id === messageId)
+    const messageIndex = messages.findIndex((msg) => msg.id === messageId)
     if (messageIndex === -1) return
 
     const messageToRetry = messages[messageIndex]
-    if (messageToRetry.role !== 'assistant') return
+    if (messageToRetry.role !== "assistant") return
 
     // Find the user message that triggered this response
     const userMessage = messageIndex > 0 ? messages[messageIndex - 1] : null
-    if (!userMessage || userMessage.role !== 'user') return
+    if (!userMessage || userMessage.role !== "user") return
 
     // Remove the AI message and regenerate
     const newMessages = messages.slice(0, messageIndex)
     setMessages(newMessages)
     setIsLoading(true)
 
-    // Generate new response
+    // Update chat history immediately
+    setChats((prev) => prev.map((chat) => (chat.id === currentChatId ? { ...chat, messages: newMessages } : chat)))
+
+    // Generate new response with proper cleanup
+    const timeoutId = setTimeout(
+      () => {
+        pendingTimeoutsRef.current.delete(timeoutId)
+
+        const activeChatId = currentChatIdRef.current
+        if (!activeChatId || activeChatId !== currentChatId) {
+          setIsLoading(false)
+          return
+        }
+
+        const newAiMessage = {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: generateFormattedResponse(userMessage.content, selectedModel),
+          timestamp: new Date(),
+        }
+
+        if (activeChatId === currentChatIdRef.current) {
+          setMessages((prev) => [...prev, newAiMessage])
+          setChats((prev) =>
+            prev.map((chat) =>
+              chat.id === activeChatId ? { ...chat, messages: [...newMessages, newAiMessage] } : chat,
+            ),
+          )
+        }
+        setIsLoading(false)
+      },
+      1000 + Math.random() * 1500,
+    )
+
+    pendingTimeoutsRef.current.add(timeoutId)
+  }
+
+  // Edit functionality
+  const handleEditStart = (messageId, currentContent) => {
+    setEditingMessageId(messageId)
+    setEditingText(currentContent)
+    // Focus the textarea after state update
     setTimeout(() => {
-      const newAiMessage = {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: generateFormattedResponse(userMessage.content, selectedModel),
-        timestamp: new Date(),
+      if (editTextareaRef.current) {
+        editTextareaRef.current.focus()
+        editTextareaRef.current.setSelectionRange(currentContent.length, currentContent.length)
       }
-      
-      setMessages(prev => [...prev, newAiMessage])
-      
-      // Update chat history
-      setChats(prev =>
-        prev.map(chat =>
-          chat.id === currentChatId
-            ? { ...chat, messages: [...newMessages, newAiMessage] }
-            : chat
-        )
-      )
-      
-      setIsLoading(false)
-    }, 1000 + Math.random() * 1500)
+    }, 0)
+  }
+
+  const handleEditCancel = () => {
+    setEditingMessageId(null)
+    setEditingText("")
+  }
+
+  const handleEditSave = async () => {
+    if (!editingText.trim() || !editingMessageId) return
+
+    const messageIndex = messages.findIndex((msg) => msg.id === editingMessageId)
+    if (messageIndex === -1) return
+
+    const originalMessage = messages[messageIndex]
+
+    // Update the message with new content and add to edit history
+    const updatedMessage = {
+      ...originalMessage,
+      content: editingText.trim(),
+      editHistory: [...(originalMessage.editHistory || [originalMessage.content]), editingText.trim()],
+      lastEdited: new Date(),
+    }
+
+    // Remove all messages after the edited message (including AI responses)
+    const newMessages = [...messages.slice(0, messageIndex), updatedMessage]
+    setMessages(newMessages)
+
+    // Update chat history immediately
+    setChats((prev) => prev.map((chat) => (chat.id === currentChatId ? { ...chat, messages: newMessages } : chat)))
+
+    // Clear editing state
+    setEditingMessageId(null)
+    setEditingText("")
+    setIsLoading(true)
+
+    // Generate new AI response for the edited message with proper cleanup
+    const timeoutId = setTimeout(
+      () => {
+        pendingTimeoutsRef.current.delete(timeoutId)
+
+        const activeChatId = currentChatIdRef.current
+        if (!activeChatId || activeChatId !== currentChatId) {
+          setIsLoading(false)
+          return
+        }
+
+        const aiMessage = {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: generateFormattedResponse(editingText.trim(), selectedModel),
+          timestamp: new Date(),
+        }
+
+        if (activeChatId === currentChatIdRef.current) {
+          setMessages((prev) => [...prev, aiMessage])
+          setChats((prev) =>
+            prev.map((chat) => (chat.id === activeChatId ? { ...chat, messages: [...newMessages, aiMessage] } : chat)),
+          )
+        }
+        setIsLoading(false)
+      },
+      1000 + Math.random() * 1500,
+    )
+
+    pendingTimeoutsRef.current.add(timeoutId)
+  }
+
+  const handleEditUndo = (messageId) => {
+    const messageIndex = messages.findIndex((msg) => msg.id === messageId)
+    if (messageIndex === -1) return
+
+    const message = messages[messageIndex]
+    const editHistory = message.editHistory || []
+
+    if (editHistory.length <= 1) return // No previous version to revert to
+
+    // Get the previous version (second to last in history)
+    const previousContent = editHistory[editHistory.length - 2]
+
+    // Update message with previous content and remove last entry from history
+    const updatedMessage = {
+      ...message,
+      content: previousContent,
+      editHistory: editHistory.slice(0, -1),
+      lastEdited: new Date(),
+    }
+
+    // Remove all messages after the edited message
+    const newMessages = [...messages.slice(0, messageIndex), updatedMessage]
+    setMessages(newMessages)
+
+    // Update chat history immediately
+    setChats((prev) => prev.map((chat) => (chat.id === currentChatId ? { ...chat, messages: newMessages } : chat)))
+
+    setIsLoading(true)
+
+    // Generate new AI response with proper cleanup
+    const timeoutId = setTimeout(
+      () => {
+        pendingTimeoutsRef.current.delete(timeoutId)
+
+        const activeChatId = currentChatIdRef.current
+        if (!activeChatId || activeChatId !== currentChatId) {
+          setIsLoading(false)
+          return
+        }
+
+        const aiMessage = {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: generateFormattedResponse(previousContent, selectedModel),
+          timestamp: new Date(),
+        }
+
+        if (activeChatId === currentChatIdRef.current) {
+          setMessages((prev) => [...prev, aiMessage])
+          setChats((prev) =>
+            prev.map((chat) => (chat.id === activeChatId ? { ...chat, messages: [...newMessages, aiMessage] } : chat)),
+          )
+        }
+        setIsLoading(false)
+      },
+      1000 + Math.random() * 1500,
+    )
+
+    pendingTimeoutsRef.current.add(timeoutId)
   }
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       handleSubmit(e)
+    }
+  }
+
+  const handleEditKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      handleEditSave()
+    } else if (e.key === "Escape") {
+      handleEditCancel()
     }
   }
 
@@ -266,19 +466,48 @@ def process_response(input_text):
     }
   }
 
+  const adjustEditTextareaHeight = () => {
+    const textarea = editTextareaRef.current
+    if (textarea) {
+      textarea.style.height = "auto"
+      const newHeight = Math.min(textarea.scrollHeight, 200)
+      textarea.style.height = `${newHeight}px`
+
+      // If content is very long, allow scrolling but only internally
+      if (newHeight >= 200) {
+        textarea.style.overflowY = "auto"
+      } else {
+        textarea.style.overflowY = "hidden"
+      }
+    }
+  }
+
   useEffect(() => {
     adjustTextareaHeight()
   }, [input])
 
+  useEffect(() => {
+    adjustEditTextareaHeight()
+  }, [editingText])
+
   const handleChatSelect = (chatId) => {
+    // Clear any pending operations when switching chats
+    clearPendingTimeouts()
+    setIsLoading(false)
+
     const chat = chats.find((c) => c.id === chatId)
     if (chat) {
       setCurrentChatId(chatId)
-      setMessages(chat.messages || [])
+      // Create a deep copy to avoid reference issues
+      setMessages([...(chat.messages || [])])
     }
   }
 
   const handleNewChat = (folderId = null) => {
+    // Clear any pending operations when creating new chat
+    clearPendingTimeouts()
+    setIsLoading(false)
+
     // Create a new chat with the specified folder ID
     const newChatId = Date.now().toString()
     const newChat = {
@@ -307,6 +536,8 @@ def process_response(input_text):
   const handleDeleteChat = (chatId) => {
     setChats((prev) => prev.filter((chat) => chat.id !== chatId))
     if (currentChatId === chatId) {
+      clearPendingTimeouts()
+      setIsLoading(false)
       setCurrentChatId(null)
       setMessages([])
     }
@@ -329,6 +560,13 @@ def process_response(input_text):
   const handleMoveChat = (chatId, targetFolderId) => {
     setChats((prev) => prev.map((chat) => (chat.id === chatId ? { ...chat, folderId: targetFolderId } : chat)))
   }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      clearPendingTimeouts()
+    }
+  }, [])
 
   const hasStartedChat = messages.length > 0
 
@@ -373,16 +611,88 @@ def process_response(input_text):
                     {messages.map((message) => (
                       <div key={message.id} className="w-full">
                         {message.role === "user" ? (
-                          /* User Message - Keep bubble style */
+                          /* User Message - With edit functionality */
                           <div className="flex justify-end">
-                            <div className="max-w-[80%] rounded-2xl px-4 py-3 bg-theme-primary text-theme-text-on-primary user-message break-words">
-                              <p className="text-sm leading-relaxed break-words">{message.content}</p>
-                              <p className="text-xs opacity-70 mt-2">
-                                {message.timestamp.toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </p>
+                            <div className="max-w-[80%] w-auto group relative">
+                              {editingMessageId === message.id ? (
+                                /* Editing Mode - Fixed width to match display mode */
+                                <div className="rounded-2xl px-4 py-3 bg-theme-primary text-theme-text-on-primary w-full">
+                                  <textarea
+                                    ref={editTextareaRef}
+                                    value={editingText}
+                                    onChange={(e) => setEditingText(e.target.value)}
+                                    onKeyDown={handleEditKeyDown}
+                                    className="w-full bg-transparent text-theme-text-on-primary resize-none outline-none text-sm leading-relaxed min-h-[24px] overflow-hidden break-words overflow-wrap-anywhere"
+                                    placeholder="Edit your message..."
+                                    style={{
+                                      scrollbarWidth: "none" /* Firefox */,
+                                      msOverflowStyle: "none" /* IE and Edge */,
+                                    }}
+                                  />
+                                  <style jsx global>{`
+                                    textarea::-webkit-scrollbar {
+                                      display: none;
+                                    }
+                                  `}</style>
+                                  <div className="flex items-center justify-between mt-3">
+                                    <p className="text-xs opacity-70">Press Enter to save, Esc to cancel</p>
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={handleEditCancel}
+                                        className="p-1 rounded hover:bg-theme-text-on-primary/10 transition-colors"
+                                        title="Cancel"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </button>
+                                      <button
+                                        onClick={handleEditSave}
+                                        className="p-1 rounded hover:bg-theme-text-on-primary/10 transition-colors"
+                                        title="Save"
+                                      >
+                                        <Check className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                /* Display Mode */
+                                <>
+                                  <div className="rounded-2xl px-4 py-3 bg-theme-primary text-theme-text-on-primary user-message break-words">
+                                    <p className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
+                                      {message.content}
+                                    </p>
+                                    <div className="flex items-center justify-between mt-2">
+                                      <p className="text-xs opacity-70">
+                                        {message.timestamp.toLocaleTimeString([], {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        })}
+                                        {message.lastEdited && <span className="ml-2">(edited)</span>}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Edit Controls - Positioned outside the bubble */}
+                                  <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <button
+                                      onClick={() => handleEditStart(message.id, message.content)}
+                                      className="p-1.5 rounded-lg hover:bg-theme-text/10 transition-colors text-theme-text/60 hover:text-theme-text"
+                                      title="Edit message"
+                                    >
+                                      <Edit3 className="w-4 h-4" />
+                                    </button>
+                                    {message.editHistory && message.editHistory.length > 1 && (
+                                      <button
+                                        onClick={() => handleEditUndo(message.id)}
+                                        className="p-1.5 rounded-lg hover:bg-theme-text/10 transition-colors text-theme-text/60 hover:text-theme-text"
+                                        title="Undo last edit"
+                                      >
+                                        <Undo className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </div>
+                                </>
+                              )}
                             </div>
                           </div>
                         ) : (
@@ -392,7 +702,7 @@ def process_response(input_text):
                             <div className="flex-shrink-0 w-8 h-8 rounded-full bg-theme-secondary flex items-center justify-center">
                               <span className="text-xs font-medium text-theme-text-on-secondary">AI</span>
                             </div>
-                            
+
                             {/* Message Content */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-3">
@@ -404,11 +714,11 @@ def process_response(input_text):
                                   })}
                                 </span>
                               </div>
-                              
+
                               {/* Formatted Message Content */}
-                              <div className="text-sm leading-relaxed">
-                                <MessageRenderer 
-                                  content={message.content} 
+                              <div className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
+                                <MessageRenderer
+                                  content={message.content}
                                   onRetry={handleRetry}
                                   messageId={message.id}
                                 />
@@ -418,7 +728,7 @@ def process_response(input_text):
                         )}
                       </div>
                     ))}
-                    
+
                     {/* Loading Animation */}
                     {isLoading && (
                       <div className="flex items-start gap-4">
