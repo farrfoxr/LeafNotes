@@ -6,6 +6,57 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* mobile vh fix */
+:root {
+  --vh: 1vh;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --vh: 1dvh;
+  }
+}
+
+/* Use dynamic viewport units */
+.h-screen {
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+}
+
+@supports (height: 100dvh) {
+  .h-screen {
+    height: 100dvh;
+  }
+}
+
+/* Add these mobile-first responsive utilities -- hydration fix*/
+@media (max-width: 767px) {
+  .mobile-sidebar-closed {
+    transform: translateX(-100%);
+  }
+  
+  .mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 30;
+  }
+}
+
+/* Prevent layout shift during hydration */
+.no-js-mobile-hide {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .no-js-mobile-hide {
+    display: block;
+  }
+}
+
+
+/* mobile vh fix END */
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -419,3 +470,4 @@ textarea::-moz-selection {
 .backdrop-exit {
   animation: backdropFadeOut 0.15s ease-in forwards;
 }
+

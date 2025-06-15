@@ -10,6 +10,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata = {
   title: "Leaf Notes",
   description: "AI-powered chatbot interface",
+  viewport: "width=device-width, initial-scale=1, viewport-fit=cover"
 }
 
 export default function RootLayout({ children }) {

@@ -34,24 +34,59 @@ export default function ChatInterface() {
 
   const models = ["GPT-4", "GPT-3.5", "Claude-3", "Gemini Pro"]
 
+  //check mobile hydration fouc fix
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+  setIsMounted(true);
+  }, []);
+
   // Check if we're on mobile
   const [isMobile, setIsMobile] = useState(false)
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-      // Auto-close sidebar on mobile, auto-open on desktop
-      if (window.innerWidth < 768) {
-        setSidebarOpen(false)
-      } else {
-        setSidebarOpen(true)
-      }
-    }
+  // useEffect(() => {
+  //   if (!isMounted) return;
 
-    checkMobile()
-    window.addEventListener("resize", checkMobile)
-    return () => window.removeEventListener("resize", checkMobile)
-  }, [])
+  //   const checkMobile = () => {
+  //     setIsMobile(window.innerWidth < 768)
+  //     // Auto-close sidebar on mobile, auto-open on desktop
+  //     if (window.innerWidth < 768) {
+  //       setSidebarOpen(false)
+  //     } else {
+  //       setSidebarOpen(true)
+  //     }
+  //   }
+
+  //   checkMobile()
+  //   window.addEventListener("resize", checkMobile)
+  //   return () => window.removeEventListener("resize", checkMobile)
+  // }, [isMounted])
+
+  useEffect(() => {
+  if (!isMounted) return;
+  
+  let timeoutId;
+  const debouncedResize = () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      const isMobileDevice = window.innerWidth < 768;
+      setIsMobile(isMobileDevice);
+      
+      if (isMobileDevice) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+      }
+    }, 100);
+  };
+
+  debouncedResize();
+  window.addEventListener("resize", debouncedResize);
+  return () => {
+    window.removeEventListener("resize", debouncedResize);
+    clearTimeout(timeoutId);
+  };
+  }, [isMounted]);
 
     // Also add this useEffect to close the dropdown when clicking outside (add this after your existing useEffects):
   useEffect(() => {
@@ -615,6 +650,23 @@ def process_response(input_text):
   // Get current chat title
   const currentChat = chats.find((chat) => chat.id === currentChatId)
   const currentChatTitle = currentChat?.title || "New Chat"
+
+  //mobile view fix
+  useEffect(() => {
+  const setVH = () => {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  };
+
+  setVH();
+  window.addEventListener('resize', setVH);
+  window.addEventListener('orientationchange', setVH);
+
+  return () => {
+    window.removeEventListener('resize', setVH);
+    window.removeEventListener('orientationchange', setVH);
+  };
+}, []);
 
   return (
     <div className="h-screen bg-theme-bg font-monkeytype flex overflow-hidden">
