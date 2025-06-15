@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { ArrowUp, Paperclip, ChevronDown, Edit3, Check, X, Undo } from "lucide-react"
+import { ArrowUp, Paperclip, ChevronDown, Edit3, Check, X, Undo, Menu } from "lucide-react"
 import { ChatSidebar } from "@/components/chat-sidebar"
 import { SettingsModal } from "@/components/settings-modal"
 import { MessageRenderer } from "@/components/message-renderer"
@@ -17,7 +17,7 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedModel, setSelectedModel] = useState("GPT-4")
   const [showModelDropdown, setShowModelDropdown] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(false) // Start closed on mobile
   const [currentChatId, setCurrentChatId] = useState(null)
   const [chats, setChats] = useState([])
   const [folders, setFolders] = useState([])
@@ -33,6 +33,38 @@ export default function ChatInterface() {
   const currentChatIdRef = useRef(currentChatId)
 
   const models = ["GPT-4", "GPT-3.5", "Claude-3", "Gemini Pro"]
+
+  // Check if we're on mobile
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      // Auto-close sidebar on mobile, auto-open on desktop
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false)
+      } else {
+        setSidebarOpen(true)
+      }
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
+    // Also add this useEffect to close the dropdown when clicking outside (add this after your existing useEffects):
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showModelDropdown && !event.target.closest('[data-model-dropdown]')) {
+        setShowModelDropdown(false)
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [showModelDropdown])
+
 
   // Update the ref whenever currentChatId changes
   useEffect(() => {
@@ -501,6 +533,11 @@ def process_response(input_text):
       // Create a deep copy to avoid reference issues
       setMessages([...(chat.messages || [])])
     }
+
+    // Close sidebar on mobile after selecting chat
+    if (isMobile) {
+      setSidebarOpen(false)
+    }
   }
 
   const handleNewChat = (folderId = null) => {
@@ -522,6 +559,11 @@ def process_response(input_text):
     setCurrentChatId(newChatId)
     setMessages([])
     setInput("")
+
+    // Close sidebar on mobile after creating new chat
+    if (isMobile) {
+      setSidebarOpen(false)
+    }
   }
 
   const handleNewFolder = () => {
@@ -576,6 +618,95 @@ def process_response(input_text):
 
   return (
     <div className="h-screen bg-theme-bg font-monkeytype flex overflow-hidden">
+      {isMobile && !sidebarOpen && (
+        <div className="fixed top-0 left-0 right-0 z-20 bg-theme-bg border-b border-theme-border/60 p-3 flex items-center justify-between">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg hover:bg-theme-hover/50 text-theme-text"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+          
+        {/* Mobile Model Selector - Only show before chat starts */}
+        {!hasStartedChat && (
+          <div className="flex-1 flex items-center justify-center px-4">
+            <div className="relative" data-model-dropdown>
+              <button
+                type="button"
+                onClick={() => setShowModelDropdown(!showModelDropdown)}
+                className="flex items-center gap-2 bg-theme-primary text-theme-text-on-primary px-3 py-1.5 rounded-lg text-sm hover:bg-theme-primary/80 transition-all duration-200 border border-theme-border/20"
+              >
+                <span className="font-medium">{selectedModel}</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-200 ${showModelDropdown ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {/* Mobile Model Dropdown */}
+              <div
+                className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-[hsl(var(--theme-dropdown-bg))] rounded-lg shadow-lg border border-theme-border min-w-[120px] z-30 transition-all duration-200 origin-top ${
+                  showModelDropdown
+                    ? "opacity-100 scale-100 translate-y-0"
+                    : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+                }`}
+              >
+                {models.map((model, index) => (
+                  <button
+                    key={model}
+                    type="button"
+                    onClick={() => {
+                      setSelectedModel(model)
+                      setShowModelDropdown(false)
+                    }}
+                    className={`w-full text-left px-3 py-2.5 text-sm text-[hsl(var(--theme-dropdown-text))] hover:bg-[hsl(var(--theme-dropdown-hover))] transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                      selectedModel === model ? 'bg-[hsl(var(--theme-dropdown-hover))] font-medium' : ''
+                    }`}
+                    style={{
+                      transitionDelay: showModelDropdown ? `${index * 50}ms` : "0ms",
+                    }}
+                  >
+                    {model}
+                    {selectedModel === model && (
+                      <span className="ml-2 text-theme-primary">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Chat Title - Show when chat has started */}
+        {hasStartedChat && (
+          <div className="flex-1 flex items-center justify-center px-4">
+            <h2 className="text-theme-text text-base font-normal tracking-wide truncate">
+              {currentChatTitle}
+            </h2>
+          </div>
+        )}
+
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="p-2 rounded-lg hover:bg-theme-hover/50 text-theme-text"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* Sidebar Overlay for Mobile */}
+      {isMobile && sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
       {/* Sidebar */}
       <ChatSidebar
         currentChatId={currentChatId}
@@ -592,31 +723,39 @@ def process_response(input_text):
         isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         onSettingsClick={() => setSettingsOpen(true)}
+        isMobile={isMobile}
       />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div
+        className={cn(
+          "flex-1 flex flex-col min-w-0",
+          isMobile && "mt-14", // Add top margin for mobile navbar
+        )}
+      >
         {hasStartedChat ? (
           <>
-            {/* Chat Title Header - Fixed position */}
-            <div className="flex-shrink-0 py-4 px-6 bg-theme-bg">
-              <h2 className="text-center text-theme-text text-lg font-normal tracking-wide">{currentChatTitle}</h2>
-            </div>
+            {/* Chat Title Header - Only show on desktop */}
+            {!isMobile && (
+              <div className="flex-shrink-0 py-4 px-6 bg-theme-bg">
+                <h2 className="text-center text-theme-text text-lg font-normal tracking-wide">{currentChatTitle}</h2>
+              </div>
+            )}
 
             {/* Messages Container - Flexible height */}
             <div className="flex-1 flex flex-col min-h-0">
               <div className="flex-1 overflow-y-auto">
-                <div className="max-w-4xl mx-auto px-6 py-6">
-                  <div className="space-y-8">
+                <div className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
+                  <div className="space-y-6 sm:space-y-8">
                     {messages.map((message) => (
                       <div key={message.id} className="w-full">
                         {message.role === "user" ? (
                           /* User Message - With edit functionality */
                           <div className="flex justify-end">
-                            <div className="max-w-[80%] w-auto group relative">
+                            <div className="max-w-[85%] sm:max-w-[80%] w-auto group relative">
                               {editingMessageId === message.id ? (
-                                /* Editing Mode - Fixed width to match display mode */
-                                <div className="rounded-2xl px-4 py-3 bg-theme-primary text-theme-text-on-primary w-full">
+                                /* Editing Mode */
+                                <div className="rounded-2xl px-3 sm:px-4 py-3 bg-theme-primary text-theme-text-on-primary w-full">
                                   <textarea
                                     ref={editTextareaRef}
                                     value={editingText}
@@ -625,15 +764,10 @@ def process_response(input_text):
                                     className="w-full bg-transparent text-theme-text-on-primary resize-none outline-none text-sm leading-relaxed min-h-[24px] overflow-hidden break-words overflow-wrap-anywhere"
                                     placeholder="Edit your message..."
                                     style={{
-                                      scrollbarWidth: "none" /* Firefox */,
-                                      msOverflowStyle: "none" /* IE and Edge */,
+                                      scrollbarWidth: "none",
+                                      msOverflowStyle: "none",
                                     }}
                                   />
-                                  <style jsx global>{`
-                                    textarea::-webkit-scrollbar {
-                                      display: none;
-                                    }
-                                  `}</style>
                                   <div className="flex items-center justify-between mt-3">
                                     <p className="text-xs opacity-70">Press Enter to save, Esc to cancel</p>
                                     <div className="flex items-center gap-2">
@@ -657,7 +791,7 @@ def process_response(input_text):
                               ) : (
                                 /* Display Mode */
                                 <>
-                                  <div className="rounded-2xl px-4 py-3 bg-theme-primary text-theme-text-on-primary user-message break-words">
+                                  <div className="rounded-2xl px-3 sm:px-4 py-3 bg-theme-primary text-theme-text-on-primary user-message break-words">
                                     <p className="text-sm leading-relaxed break-words overflow-wrap-anywhere">
                                       {message.content}
                                     </p>
@@ -672,7 +806,7 @@ def process_response(input_text):
                                     </div>
                                   </div>
 
-                                  {/* Edit Controls - Positioned outside the bubble */}
+                                  {/* Edit Controls */}
                                   <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                     <button
                                       onClick={() => handleEditStart(message.id, message.content)}
@@ -696,16 +830,16 @@ def process_response(input_text):
                             </div>
                           </div>
                         ) : (
-                          /* Assistant Message - With formatted content */
-                          <div className="flex items-start gap-4">
+                          /* Assistant Message */
+                          <div className="flex items-start gap-3 sm:gap-4">
                             {/* AI Avatar */}
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-theme-secondary flex items-center justify-center">
+                            <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-theme-secondary flex items-center justify-center">
                               <span className="text-xs font-medium text-theme-text-on-secondary">AI</span>
                             </div>
 
                             {/* Message Content */}
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-3">
+                              <div className="flex items-center gap-2 mb-2 sm:mb-3">
                                 <span className="text-sm font-medium text-theme-text">{selectedModel}</span>
                                 <span className="text-xs text-theme-text opacity-60">
                                   {message.timestamp.toLocaleTimeString([], {
@@ -731,8 +865,8 @@ def process_response(input_text):
 
                     {/* Loading Animation */}
                     {isLoading && (
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-theme-secondary flex items-center justify-center">
+                      <div className="flex items-start gap-3 sm:gap-4">
+                        <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-theme-secondary flex items-center justify-center">
                           <span className="text-xs font-medium text-theme-text-on-secondary">AI</span>
                         </div>
                         <div className="flex-1 min-w-0">
@@ -759,17 +893,17 @@ def process_response(input_text):
               </div>
 
               {/* Input Section - Fixed at bottom */}
-              <div className="flex-shrink-0 p-4 bg-theme-bg">
+              <div className="flex-shrink-0 p-3 sm:p-4 bg-theme-bg">
                 <div className="max-w-3xl mx-auto">
                   <form onSubmit={handleSubmit} className="relative">
-                    <div className="bg-theme-primary rounded-2xl p-4 shadow-lg">
-                      <div className="flex items-center gap-3">
+                    <div className="bg-theme-primary rounded-2xl p-3 sm:p-4 shadow-lg">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         {/* Attachment Button */}
                         <button
                           type="button"
                           className="text-theme-text-on-primary hover:text-theme-text-on-primary/80 transition-colors p-1"
                         >
-                          <Paperclip className="w-5 h-5" />
+                          <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
 
                         {/* Input Field */}
@@ -792,13 +926,13 @@ def process_response(input_text):
                           />
                         </div>
 
-                        {/* Send Button with Arrow Up */}
+                        {/* Send Button */}
                         <button
                           type="submit"
                           disabled={!input.trim() || isLoading}
                           className="bg-theme-secondary text-theme-text-on-secondary p-2 rounded-lg hover:bg-theme-secondary/80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
                         >
-                          <ArrowUp className="w-5 h-5" />
+                          <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
                       </div>
                     </div>
@@ -810,20 +944,24 @@ def process_response(input_text):
         ) : (
           /* Initial State - Centered content when no messages */
           <div className="flex-1 flex flex-col justify-center">
-            <div className="max-w-4xl mx-auto px-6 w-full">
+            <div className="max-w-4xl mx-auto px-3 sm:px-6 w-full">
               {/* Header */}
-              <div className="text-center mb-16">
-                <h1 className="text-5xl md:text-6xl font-light text-theme-text tracking-wide">Leaf Notes</h1>
-                <p className="text-theme-text opacity-60 mt-4 text-lg">Your AI-powered conversation companion</p>
+              <div className="text-center mb-8 sm:mb-16">
+                <h1 className="text-3xl sm:text-5xl md:text-6xl font-light text-theme-text tracking-wide">
+                  Leaf Notes
+                </h1>
+                <p className="text-theme-text opacity-60 mt-2 sm:mt-4 text-base sm:text-lg">
+                  Your AI-powered conversation companion
+                </p>
               </div>
 
               {/* Input Section */}
               <div className="relative max-w-3xl mx-auto">
                 <form onSubmit={handleSubmit} className="relative">
-                  <div className="bg-theme-primary rounded-2xl p-4 shadow-lg">
-                    <div className="flex items-center gap-3">
-                      {/* Model Selector */}
-                      <div className="relative">
+                  <div className="bg-theme-primary rounded-2xl p-3 sm:p-4 shadow-lg">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      {/* Model Selector - Show on larger screens only */}
+                      <div className="relative hidden md:block" data-model-dropdown>
                         <button
                           type="button"
                           onClick={() => setShowModelDropdown(!showModelDropdown)}
@@ -835,7 +973,7 @@ def process_response(input_text):
                           />
                         </button>
 
-                        {/* Animated Dropdown - Updated with theme-aware colors */}
+                        {/* Dropdown */}
                         <div
                           className={`absolute bottom-full mb-2 left-0 bg-[hsl(var(--theme-dropdown-bg))] rounded-lg shadow-lg border border-theme-border min-w-[120px] z-10 transition-all duration-200 origin-bottom ${
                             showModelDropdown
@@ -867,7 +1005,7 @@ def process_response(input_text):
                         type="button"
                         className="text-theme-text-on-primary hover:text-theme-text-on-primary/80 transition-colors p-1"
                       >
-                        <Paperclip className="w-5 h-5" />
+                        <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
 
                       {/* Input Field */}
@@ -890,20 +1028,20 @@ def process_response(input_text):
                         />
                       </div>
 
-                      {/* Send Button with Arrow Up */}
+                      {/* Send Button */}
                       <button
                         type="submit"
                         disabled={!input.trim() || isLoading}
                         className="bg-theme-secondary text-theme-text-on-secondary p-2 rounded-lg hover:bg-theme-secondary/80 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 active:scale-95"
                       >
-                        <ArrowUp className="w-5 h-5" />
+                        <ArrowUp className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                     </div>
                   </div>
                 </form>
 
                 {/* Helper Text */}
-                <p className="text-center text-theme-text opacity-60 mt-6 text-sm">
+                <p className="text-center text-theme-text opacity-60 mt-4 sm:mt-6 text-sm">
                   Start typing to begin your conversation...
                 </p>
               </div>
