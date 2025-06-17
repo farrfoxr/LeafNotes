@@ -1,3 +1,4 @@
+// © 2025 Farrell Laurensius Suryadi. All rights reserved.
 "use client"
 
 import { useState } from "react"
